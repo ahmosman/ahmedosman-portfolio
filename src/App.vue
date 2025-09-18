@@ -1,47 +1,46 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import CityMainPagePage from './components/pages/CityMainPagePage.vue'
+import CityExperiencePage from './components/pages/CityExperiencePage.vue'
+import CitySkillsPage from './components/pages/CitySkillsPage.vue'
+import CityProjectsPage from './components/pages/CityProjectsPage.vue'
+import CityAboutPage from './components/pages/CityAboutPage.vue'
+import CityContactPage from './components/pages/CityContactPage.vue'
+import AppBar from './components/AppBar.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <v-app>
+    <AppBar />
+    <main>
+      <section id="main-page">
+        <CityMainPagePage />
+      </section>
+      <section id="experience">
+        <CityExperiencePage />
+      </section>
+      <section id="skills">
+        <CitySkillsPage />
+      </section>
+      <section id="projects">
+        <CityProjectsPage />
+      </section>
+      <section id="about">
+        <CityAboutPage />
+      </section>
+      <section id="contact">
+        <CityContactPage />
+      </section>
+    </main>
+  </v-app>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+main {
+  width: 100vw;
+  overflow-x: hidden;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+section {
+  min-height: 100vh;
+  position: relative;
 }
 </style>

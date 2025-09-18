@@ -84,3 +84,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.city-bg {
+  width: 100vw;
+  min-height: 100vw;
+  position: relative;
+  overflow-x: hidden;
+  background-size: 100vw auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .city-bg {
+    min-height: 100vh;
+  }
+}
