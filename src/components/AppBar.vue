@@ -7,7 +7,7 @@ const sections = [
   { id: 'experience', label: 'Experience', color: 'rgba(213, 222, 232, 0.7)' },
   { id: 'skills', label: 'Skills', color: 'rgba(216, 238, 241, 0.7)' },
   { id: 'projects', label: 'Projects', color: 'rgba(219, 206, 211, 0.7)' },
-  { id: 'about', label: 'About', color: 'rgba(213, 222, 232, 0.7)' },
+  { id: 'about', label: 'About', color: 'rgba(218, 205, 170, 0.7)' },
   { id: 'contact', label: 'Contact', color: 'rgba(203, 195, 183, 0.7)' },
 ]
 

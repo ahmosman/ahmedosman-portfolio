@@ -1,26 +1,133 @@
 <template>
-  <div class="city-bg city-bg--image">
-    <h1 class="title title-position">You are very welcome to my page</h1>
-    <!-- All overlay content here will be above the SVG background -->
+  <div class="city-bg" ref="cityBg">
+    <img
+      class="city-bg-svg"
+      src="@/assets/svg/1-city-main-page-blank.svg"
+      alt="Main Page Background"
+    />
+    <h2 class="page-heading">You are very welcome to my page</h2>
+    <div class="title">
+      <h1>Ahmed Osman</h1>
+      <p>Web Developer</p>
+    </div>
   </div>
 </template>
 
 <script setup>
-// No logic yet
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const cityBg = ref(null)
+
+function updateGradientPercentage() {
+  if (!cityBg.value) return
+  const w = window.innerWidth
+  const minP = 35,
+    maxP = 85,
+    maxW = 1920
+  const p = Math.max(minP, maxP - (w / maxW) * (maxP - minP))
+  cityBg.value.style.setProperty('--gradient-split', `${p}%`)
+}
+onMounted(() => {
+  updateGradientPercentage()
+  window.addEventListener('resize', updateGradientPercentage)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', updateGradientPercentage)
+})
 </script>
 
 <style scoped>
-.city-bg--image {
-  background: #dcd8d7 url('@/assets/svg/1-city-main-page.svg') no-repeat bottom;
-  background-size: 100vw auto;
+.city-bg {
+  position: relative;
+  width: 100vw;
+  background: linear-gradient(
+    to bottom,
+    #dcd8d7 0%,
+    #dcd8d7 var(--gradient-split),
+    #f1e1e8 var(--gradient-split),
+    #f1e1e8 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow-x: hidden;
 }
-
-.title {
+.city-bg-svg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: auto;
+  max-width: 100vw;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+.page-heading {
   position: absolute;
   top: 4rem;
   left: 2rem;
   font-size: 1.2rem;
   font-weight: bold;
   color: #333;
+  z-index: 1;
+}
+.title {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: var(--gradient-split, 50%);
+  transform: translate(-50%, -60%);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+.title h1 {
+  font-size: 3.5rem;
+  font-weight: bold;
+}
+.title p {
+  font-size: 2rem;
+}
+
+@media (max-width: 1450px) {
+  .title {
+    transform: translate(-40%, -60%);
+  }
+}
+@media (max-width: 1200px) {
+  .title h1 {
+    font-size: 2.5rem;
+  }
+  .title p {
+    font-size: 1.5rem;
+  }
+}
+@media (max-width: 900px) {
+  .title h1 {
+    font-size: 1.5rem;
+  }
+  .title p {
+    font-size: 1.1rem;
+  }
+}
+@media (max-width: 650px) {
+  .title h1 {
+    font-size: 1.2rem;
+  }
+  .title p {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 380px) {
+  .title h1 {
+    font-size: 0.9rem;
+  }
+  .title p {
+    font-size: 0.7rem;
+  }
 }
 </style>

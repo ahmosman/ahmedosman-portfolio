@@ -34,6 +34,10 @@
   --color-text: var(--vt-c-text-light-1);
 
   --section-gap: 160px;
+
+  --about-bg-color: #dacdaa;
+  --about-sun-color: #f0e2b9;
+  --about-mountain-color: #c8bbb4;
 }
 
 @media (prefers-color-scheme: dark) {

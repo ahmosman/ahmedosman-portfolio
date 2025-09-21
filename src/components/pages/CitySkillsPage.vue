@@ -11,7 +11,7 @@
 
 <style scoped>
 .city-bg--image {
-  background: #d8eef1 url('@/assets/svg/3-city-skills.svg') no-repeat bottom;
+  background: #d8eef1 url('@/assets/svg/3-city-skills-blank.svg') no-repeat bottom;
   background-size: 100vw auto;
 }
 

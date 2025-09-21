@@ -11,7 +11,7 @@
 
 <style scoped>
 .city-bg--image {
-  background: #d5dee8 url('@/assets/svg/2-city-experience.svg') no-repeat bottom;
+  background: #d5dee8 url('@/assets/svg/2-city-experience-blank.svg') no-repeat bottom;
   background-size: 100vw auto;
 }
 

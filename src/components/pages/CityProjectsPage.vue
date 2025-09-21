@@ -11,7 +11,7 @@
 
 <style scoped>
 .city-bg--image {
-  background: #dbced3 url('@/assets/svg/4-city-projects.svg') no-repeat bottom;
+  background: #dbced3 url('@/assets/svg/4-city-projects-blank.svg') no-repeat bottom;
   background-size: 100vw auto;
 }
 

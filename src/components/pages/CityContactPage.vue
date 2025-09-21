@@ -11,7 +11,7 @@
 
 <style scoped>
 .city-bg--image {
-  background: #cbc3b7 url('@/assets/svg/6-city-contact.svg') no-repeat bottom;
+  background: #cbc3b7 url('@/assets/svg/6-city-contact-blank.svg') no-repeat bottom;
   background-size: 100vw auto;
 }
 
