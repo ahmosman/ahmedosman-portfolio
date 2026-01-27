@@ -11,16 +11,8 @@
 
 <style scoped>
 .city-bg--image {
-  background: #d8eef1 url('@/assets/svg/3-city-skills-blank.svg') no-repeat bottom;
+  background: url('@/assets/svg/3-city-skills-blank.svg') no-repeat bottom;
   background-size: 100vw auto;
-}
-
-.title {
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
+  background-color: transparent;
 }
 </style>

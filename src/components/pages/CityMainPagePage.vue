@@ -40,13 +40,7 @@ onUnmounted(() => {
 .city-bg {
   position: relative;
   width: 100vw;
-  background: linear-gradient(
-    to bottom,
-    #dcd8d7 0%,
-    #dcd8d7 var(--gradient-split),
-    #f1e1e8 var(--gradient-split),
-    #f1e1e8 100%
-  );
+  background-color: transparent;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -62,15 +56,6 @@ onUnmounted(() => {
   z-index: 0;
   pointer-events: none;
   display: block;
-}
-.page-heading {
-  position: absolute;
-  top: 4rem;
-  left: 2rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
-  z-index: 1;
 }
 .title {
   position: absolute;

@@ -105,3 +105,66 @@ body {
     min-height: 100vh;
   }
 }
+
+/* Global title style for page headings */
+.title {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Larger title for tablets (768px and up) */
+@media (min-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+    top: 3rem;
+    left: 4rem;
+  }
+}
+
+/* Even larger title for desktops (1024px and up) */
+@media (min-width: 1024px) {
+  .title {
+    font-size: 2.5rem;
+  }
+}
+
+/* Global page heading style (welcome message, etc.) */
+.page-heading {
+  position: absolute;
+  top: 4rem;
+  left: 2rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  z-index: 1;
+}
+
+/* Larger page heading for tablets (768px and up) */
+@media (min-width: 768px) {
+  .page-heading {
+    font-size: 1.4rem;
+    top: 5rem;
+    left: 4rem;
+  }
+}
+
+/* Even larger page heading for desktops (1024px and up) */
+@media (min-width: 1024px) {
+  .page-heading {
+    font-size: 1.8rem;
+  }
+}
+
+/* Force the main Vuetify container to be transparent */
+.v-application {
+  background: transparent !important;
+}
+
+/* Optionally: make sure that body also has no color, if it's set somewhere */
+body {
+  background: transparent;
+}

@@ -1,7 +1,6 @@
 <template>
   <div class="city-bg">
     <div class="scene">
-      <div class="bg-color"></div>
       <div class="sun"></div>
       <div class="mountain"></div>
       <img
@@ -25,13 +24,6 @@
   width: 100%;
   height: 100%;
   inset: 0;
-}
-
-.bg-color {
-  position: absolute;
-  inset: 0;
-  background-color: var(--about-bg-color);
-  z-index: 1;
 }
 
 .sun {
