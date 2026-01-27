@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
-// Funkcja pomocnicza do mieszania kolorów HEX
+// Helper function for blending HEX colors
 function interpolateColor(color1, color2, factor) {
   if (arguments.length < 3) return color1
 
@@ -21,10 +21,10 @@ function interpolateColor(color1, color2, factor) {
 }
 
 export function useScrollBackground() {
-  const backgroundColor = ref('#dcd8d7') // Kolor startowy
+  const backgroundColor = ref('#dcd8d7') // Starting color
 
-  // Definiujemy "przystanki" kolorystyczne.
-  // Position to % przewinięcia strony (warto dostosować do długości sekcji)
+  // Define color "stops".
+  // Position is % of page scroll (adjust based on section lengths)
   const stops = [
     { pos: 0, color: '#dcd8d7' }, // Main Page Start
     { pos: 0.15, color: '#f1e1e8' }, // Main Page End / Transition
@@ -40,7 +40,7 @@ export function useScrollBackground() {
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight
     const scrollPercentage = Math.min(Math.max(scrollY / maxScroll, 0), 1)
 
-    // Znajdź dwa kolory, pomiędzy którymi się znajdujemy
+    // Find the two colors we are currently between
     for (let i = 0; i < stops.length - 1; i++) {
       const start = stops[i]
       const end = stops[i + 1]
@@ -57,7 +57,7 @@ export function useScrollBackground() {
   }
 
   onMounted(() => {
-    handleScroll() // Uruchom przy starcie
+    handleScroll() // Run on startup
     window.addEventListener('scroll', handleScroll)
   })
 

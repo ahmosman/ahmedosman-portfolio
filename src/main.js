@@ -3,6 +3,7 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import './assets/base.css'
+import './assets/scrollbar.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

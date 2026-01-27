@@ -28,6 +28,10 @@
   - SVGs and images are in `src/assets/svg/`.
 - **Routing:**
   - If routing is present, it will be configured in `src/main.js` or a `router` directory (not found in current structure).
+- **Code Comments:**
+  - **All comments in the codebase MUST be written in English.**
+  - Use clear, descriptive English for all inline comments, JSDoc, and CSS comments.
+  - This ensures consistency and maintainability across the project.
 
 ## Integration & External Dependencies
 

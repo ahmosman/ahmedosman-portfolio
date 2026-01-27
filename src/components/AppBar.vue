@@ -44,20 +44,20 @@ const smoothScrollToElement = (target, duration = 1000) => {
 }
 
 /**
- * ZMODYFIKOWANA FUNKCJA NAWIGACJI
- * Uruchamia zamykanie menu i scrollowanie równocześnie
+ * MODIFIED NAVIGATION FUNCTION
+ * Triggers menu closing and scrolling simultaneously
  */
 const scrollToSection = (sectionId) => {
-  // 1. Jeśli menu jest otwarte, zleć jego zamknięcie
+  // 1. If menu is open, close it
   if (drawer.value) {
     closeMenu()
   }
 
-  // 2. Znajdź element i zacznij scrollować OD RAZU (bez czekania/delay)
+  // 2. Find element and start scrolling IMMEDIATELY (no waiting/delay)
   const element = document.getElementById(sectionId)
   if (element) {
-    // Scrollujemy przez 1000ms. Ponieważ menu jest półprzezroczyste,
-    // użytkownik zobaczy przesuwające się tło pod znikającym menu.
+    // Scroll for 1000ms. Since the menu is semi-transparent,
+    // user will see the moving background under the disappearing menu.
     smoothScrollToElement(element, 1000)
   }
 }
