@@ -7,6 +7,7 @@
 - The UI is organized into pages under `src/components/pages/` (e.g., `CityAboutPage.vue`, `CityProjectsPage.vue`).
 - Shared UI and logic are in `src/components/` and `src/stores/` (Pinia store, e.g., `counter.js`).
 - Static assets (CSS, SVGs) are in `src/assets/`.
+- Data for the website is stored in `src/data/` (Git submodule).
 
 ## Key Workflows
 
