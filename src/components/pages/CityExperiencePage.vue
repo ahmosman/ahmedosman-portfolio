@@ -1,6 +1,6 @@
 <template>
   <div class="city-bg city-bg--image">
-    <div class="experience-wrapper">
+    <div class="page-wrapper">
       <header class="header-section">
         <h1 class="title-main">{{ pageData.title }}</h1>
         <p class="subtitle-main">{{ pageData.subtitle }}</p>
@@ -62,151 +62,142 @@
         </div>
       </div>
 
-      <Teleport to="body">
-        <Transition name="fade">
-          <div v-if="isMobile && showModal" class="modal-overlay" @click="closeModal">
-            <div
-              class="modal-content content-block"
-              :style="{ backgroundColor: blockColor }"
-              @click.stop
-            >
-              <button class="close-btn" @click="closeModal">&times;</button>
-
-              <div v-if="selectedItem">
-                <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
-                <h4 class="detail-job-title">{{ selectedItem.title }}</h4>
-                <div class="detail-body">
-                  <p>{{ selectedItem.description }}</p>
-                </div>
-              </div>
-            </div>
+      <DetailModal
+        :is-open="isMobile && showModal"
+        :background-color="blockColor"
+        @close="closeModal"
+      >
+        <div v-if="selectedItem">
+          <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
+          <h4 class="detail-job-title">{{ selectedItem.title }}</h4>
+          <div class="detail-body">
+            <p>{{ selectedItem.description }}</p>
           </div>
-        </Transition>
-      </Teleport>
+        </div>
+      </DetailModal>
     </div>
   </div>
 </template>
 
 <script setup>
+import '@/assets/pages-common.css'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { getAllSections, getItemById } from '@/services/experienceService'
-import experienceData from '@/data/experience.json'
+import { useDataStore } from '@/stores'
 import { useScrollBackground } from '@/composables/useScrollColor'
+import DetailModal from '@/components/common/DetailModal.vue'
 
-// ============================
-// State Management
-// ============================
-const pageData = ref({ title: '', subtitle: '' })
-const sections = ref([])
+// --- Pinia Store ---
+const dataStore = useDataStore()
+const pageData = computed(() => dataStore.getExperiencePage)
+const sections = computed(() => dataStore.getExperienceSections)
+
+// Local state
 const selectedItemId = ref(null)
 const selectedItem = ref(null)
 const selectedInstitutionName = ref('')
 
-// Mobile State
 const isMobile = ref(false)
 const showModal = ref(false)
 const MOBILE_BREAKPOINT = 1100
 
-// ============================
-// Dynamic Background Color
-// ============================
+// --- Color (no changes) ---
 const { backgroundColor } = useScrollBackground()
 
 const blockColor = computed(() => {
   const hex = backgroundColor.value
   if (!hex) return 'rgba(164, 200, 221, 0.85)'
-
   let cleanHex = hex.substring(1)
-  if (cleanHex.length === 3) {
+  if (cleanHex.length === 3)
     cleanHex = cleanHex
       .split('')
-      .map((char) => char + char)
+      .map((c) => c + c)
       .join('')
-  }
-
   const num = parseInt(cleanHex, 16)
-  let r = (num >> 16) & 255
-  let g = (num >> 8) & 255
-  let b = num & 255
-
-  const darkenFactor = 0.9
-  r = Math.floor(r * darkenFactor)
-  g = Math.floor(g * darkenFactor)
-  b = Math.floor(b * darkenFactor)
-
-  return `rgba(${r}, ${g}, ${b}, 0.85)`
+  let r = (num >> 16) & 255,
+    g = (num >> 8) & 255,
+    b = num & 255
+  const factor = 0.9
+  return `rgba(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)}, 0.85)`
 })
 
-// ============================
-// Floating Block Animation
-// ============================
+// --- Animation (no changes) ---
 const containerRef = ref(null)
 const floatingBlockRef = ref(null)
 const floatingY = ref(0)
-
 let targetY = 0
 let animationFrameId = null
 const EASE_FACTOR = 0.02
 
 function animateFloatingBlock() {
   if (isMobile.value) return
-
   if (!containerRef.value || !floatingBlockRef.value) {
     animationFrameId = requestAnimationFrame(animateFloatingBlock)
     return
   }
+  const cRect = containerRef.value.getBoundingClientRect()
+  const bRect = floatingBlockRef.value.getBoundingClientRect()
+  const wHeight = window.innerHeight
 
-  const containerRect = containerRef.value.getBoundingClientRect()
-  const blockRect = floatingBlockRef.value.getBoundingClientRect()
-  const windowHeight = window.innerHeight
-
-  let idealY = -containerRect.top + windowHeight / 2 - blockRect.height / 2
-
-  const maxY = containerRect.height - blockRect.height
+  let idealY = -cRect.top + wHeight / 2 - bRect.height / 2
+  const maxY = cRect.height - bRect.height
   if (idealY < 0) idealY = 0
   if (idealY > maxY) idealY = maxY
-  if (containerRect.height < blockRect.height) idealY = 0
+  if (cRect.height < bRect.height) idealY = 0
 
   targetY = idealY
-
   const diff = targetY - floatingY.value
-  if (Math.abs(diff) > 0.1) {
-    floatingY.value += diff * EASE_FACTOR
-  } else {
-    floatingY.value = targetY
-  }
+  if (Math.abs(diff) > 0.1) floatingY.value += diff * EASE_FACTOR
+  else floatingY.value = targetY
 
   animationFrameId = requestAnimationFrame(animateFloatingBlock)
 }
 
-// ============================
-// Lifecycle & Responsiveness
-// ============================
+// --- Helpers ---
+function getItemById(id) {
+  // Helper function to search in Pinia store data
+  for (const section of sections.value) {
+    for (const inst of section.institutions) {
+      const found = inst.items.find((i) => i.id === id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
 function checkMobile() {
   isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
-
   if (!isMobile.value && !animationFrameId) {
     animationFrameId = requestAnimationFrame(animateFloatingBlock)
   }
 }
 
+function selectItem(itemId, institutionName) {
+  selectedItemId.value = itemId
+  selectedItem.value = getItemById(itemId)
+  selectedInstitutionName.value = institutionName
+  if (isMobile.value) showModal.value = true
+}
+
+function closeModal() {
+  showModal.value = false
+  selectedItemId.value = null
+}
+
+// --- Lifecycle ---
 onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
 
-  pageData.value = experienceData.page || {
-    title: 'My experience',
-    subtitle: 'Pick one to see some details',
+  // Load data through Pinia
+  if (!dataStore.isDataLoaded) {
+    dataStore.loadAllData()
   }
-  sections.value = getAllSections()
 
-  if (!isMobile.value) {
-    if (sections.value.length > 0 && sections.value[0].institutions.length > 0) {
-      const firstInstitution = sections.value[0].institutions[0]
-      if (firstInstitution.items.length > 0) {
-        const firstItem = firstInstitution.items[0]
-        selectItem(firstItem.id, firstInstitution.name)
-      }
+  // Auto-select after data is loaded (desktop only)
+  if (!isMobile.value && sections.value.length > 0) {
+    const firstInst = sections.value[0].institutions[0]
+    if (firstInst && firstInst.items.length > 0) {
+      selectItem(firstInst.items[0].id, firstInst.name)
     }
   }
 
@@ -215,76 +206,18 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkMobile)
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId)
-  }
+  if (animationFrameId) cancelAnimationFrame(animationFrameId)
 })
-
-// ============================
-// Event Handlers
-// ============================
-function selectItem(itemId, institutionName) {
-  selectedItemId.value = itemId
-  selectedItem.value = getItemById(itemId)
-  selectedInstitutionName.value = institutionName
-
-  if (isMobile.value) {
-    showModal.value = true
-  }
-}
-
-function closeModal() {
-  showModal.value = false
-  selectedItemId.value = null
-}
 </script>
 
 <style scoped>
-/* ============================
-   Background & Layout
-   ============================ */
+/* Background */
 .city-bg--image {
   background: url('@/assets/svg/2-city-experience-blank.svg') no-repeat bottom center;
   background-size: cover;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
 }
 
-.experience-wrapper {
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 140px 3rem 4rem 3rem;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============================
-   Header Section
-   ============================ */
-.header-section {
-  margin-bottom: 3rem;
-  text-align: left;
-}
-
-.title-main {
-  font-size: 4.5rem;
-  font-weight: 800;
-  color: #000;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-}
-
-.subtitle-main {
-  font-size: 1.8rem;
-  color: #222;
-  margin: 0;
-}
-
-/* ============================
-   Two Column Layout
-   ============================ */
+/* Two Column Layout */
 .experience-flex-container {
   display: flex;
   flex-direction: row;
@@ -305,15 +238,7 @@ function closeModal() {
   position: relative;
 }
 
-/* ============================
-   Content Blocks
-   ============================ */
-.content-block {
-  padding: 3.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s ease;
-}
-
+/* Detail Block */
 .detail-block-content {
   will-change: transform;
   transform-origin: center top;
@@ -416,41 +341,6 @@ function closeModal() {
   min-height: 300px;
 }
 
-/* ============================
-   MODAL STYLES (Mobile)
-   ============================ */
-/* Teleport przenosi to do body, więc fixed działa względem okna, a nie rodzica */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99999;
-
-  /* Blur Effect */
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.modal-content {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-  border-radius: 12px;
-  padding: 2.5rem;
-  /* Zapewniamy cień dla lepszej widoczności na rozmytym tle */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
 .close-btn {
   position: absolute;
   top: 1rem;
@@ -476,28 +366,8 @@ function closeModal() {
   opacity: 0;
 }
 
-/* ============================
-   Responsive Design
-   ============================ */
-
-/* Screens up to 1800px - Reduce sizes */
+/* Responsive Design */
 @media (max-width: 1800px) {
-  .experience-wrapper {
-    padding: 100px 2.5rem 3rem 2.5rem;
-  }
-
-  .title-main {
-    font-size: 3.5rem;
-  }
-
-  .subtitle-main {
-    font-size: 1.5rem;
-  }
-
-  .content-block {
-    padding: 2.5rem;
-  }
-
   .block-heading {
     font-size: 2rem;
   }
@@ -533,26 +403,9 @@ function closeModal() {
   }
 }
 
-/* Screens up to 1400px - Further reduce */
 @media (max-width: 1400px) {
-  .experience-wrapper {
-    padding: 80px 2rem 2rem 2rem;
-  }
-
-  .title-main {
-    font-size: 3rem;
-  }
-
-  .subtitle-main {
-    font-size: 1.3rem;
-  }
-
   .experience-flex-container {
     gap: 3rem;
-  }
-
-  .content-block {
-    padding: 2rem;
   }
 
   .block-heading {
@@ -595,26 +448,9 @@ function closeModal() {
   }
 }
 
-/* Tablets and below */
 @media (max-width: 1100px) {
   .experience-flex-container {
     flex-direction: column;
-  }
-
-  .title-main {
-    font-size: 2.5rem;
-  }
-
-  .subtitle-main {
-    font-size: 1.2rem;
-  }
-
-  .experience-wrapper {
-    padding: 80px 1.5rem 2rem 1.5rem;
-  }
-
-  .content-block {
-    padding: 1.8rem;
   }
 
   .item-period {
