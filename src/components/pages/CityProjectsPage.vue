@@ -10,7 +10,7 @@
         <ProjectCarousel
           :projects="projects"
           :blockColor="blockColor"
-          :showText="pageData.show"
+          :showText="pageData['show-label']"
           @open-details="openModal"
         />
       </div>
@@ -25,9 +25,9 @@
         <ProjectDetails
           v-if="selectedProject"
           :project="selectedProject"
-          :stackLabel="pageData.stack"
-          :releaseDateLabel="pageData['relase-date-title']"
-          :descriptionLabel="pageData['description-title']"
+          :stackLabel="pageData['stack-label']"
+          :releaseDateLabel="pageData['relase-date-label']"
+          :descriptionLabel="pageData['description-label']"
         />
       </DetailModal>
     </div>
