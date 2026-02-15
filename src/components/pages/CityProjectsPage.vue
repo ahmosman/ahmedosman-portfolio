@@ -7,21 +7,27 @@
       </header>
 
       <div class="carousel-display-area">
-        <ProjectCarousel 
+        <ProjectCarousel
           :projects="projects"
           :blockColor="blockColor"
+          :showText="pageData.show"
           @open-details="openModal"
         />
       </div>
 
-      <DetailModal 
-        :is-open="isModalOpen" 
+      <DetailModal
+        :is-open="isModalOpen"
         :background-color="blockColor"
+        :projectLink="selectedProject?.['project-link']"
+        :githubLink="selectedProject?.['github-link']"
         @close="closeModal"
       >
-        <ProjectDetails 
-          v-if="selectedProject" 
-          :project="selectedProject" 
+        <ProjectDetails
+          v-if="selectedProject"
+          :project="selectedProject"
+          :stackLabel="pageData.stack"
+          :releaseDateLabel="pageData['relase-date-title']"
+          :descriptionLabel="pageData['description-title']"
         />
       </DetailModal>
     </div>
@@ -46,13 +52,13 @@ const blockColor = computed(() => {
   const hex = backgroundColor.value
   if (!hex) return 'rgba(219, 206, 211, 0.95)'
   let cleanHex = hex.substring(1)
-  if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(c=>c+c).join('')
+  if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c + c).join('')
   const num = parseInt(cleanHex, 16)
   let r = (num >> 16) & 255
   let g = (num >> 8) & 255
   let b = num & 255
   const factor = 0.95
-  return `rgba(${Math.floor(r*factor)}, ${Math.floor(g*factor)}, ${Math.floor(b*factor)}, 0.95)`
+  return `rgba(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)}, 0.95)`
 })
 
 const isModalOpen = ref(false)
@@ -84,7 +90,6 @@ onMounted(() => {
 }
 
 .page-wrapper {
-  padding: 140px 0 4rem 0; 
   width: 100%;
   max-width: 100%;
   margin: 0;
@@ -107,7 +112,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   width: 100%;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 /* Responsive */
@@ -115,6 +120,7 @@ onMounted(() => {
   .page-wrapper {
     padding-top: 100px;
   }
+
   .header-section {
     padding: 0 1.5rem;
   }

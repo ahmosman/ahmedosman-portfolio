@@ -6,24 +6,26 @@
         <p class="subtitle-main">{{ pageData.subtitle }}</p>
       </header>
 
-      <div class="skills-flex-container">
-        <div
-          v-for="section in sections"
-          :key="section.id"
-          class="skill-section-block"
-          :style="{ backgroundColor: blockColor }"
-        >
-          <h3 class="section-heading">{{ section.name }}</h3>
+      <div class="skills-display-area">
+        <div class="skills-flex-container">
+          <div
+            v-for="section in sections"
+            :key="section.id"
+            class="skill-section-block"
+            :style="{ backgroundColor: blockColor }"
+          >
+            <h3 class="section-heading">{{ section.name }}</h3>
 
-          <div class="pills-container">
-            <div
-              v-for="skill in section.skills"
-              :key="skill.id"
-              class="skill-pill"
-              @click="openSkillDetails(skill)"
-            >
-              <img :src="getIconUrl(skill.icon)" :alt="skill.name" class="skill-icon" />
-              <span class="skill-name">{{ skill.name }}</span>
+            <div class="pills-container">
+              <div
+                v-for="skill in section.skills"
+                :key="skill.id"
+                class="skill-pill"
+                @click="openSkillDetails(skill)"
+              >
+                <img :src="getIconUrl(skill.icon)" :alt="skill.name" class="skill-icon" />
+                <span class="skill-name">{{ skill.name }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -114,18 +116,26 @@ onMounted(() => {
   background-size: cover;
 }
 
+.skills-display-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+}
+
 /* Flexbox System */
 .skills-flex-container {
   display: flex;
   flex-wrap: wrap; /* Allows elements to wrap to a new line */
-  gap: 3rem; /* Gap between elements */
+  gap: 10rem; /* Gap between elements */
   width: 100%;
 }
 
 /* Section (Container) */
 .skill-section-block {
   /* Calculate width for 2 columns: 50% minus half the gap */
-  width: calc(50% - 1.5rem);
+  width: calc(50% - 6rem);
 
   padding: 2.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -224,11 +234,11 @@ onMounted(() => {
 
 @media (max-width: 1400px) {
   .skills-flex-container {
-    gap: 2rem;
+    gap: 3rem;
   }
 
   .skill-section-block {
-    width: calc(50% - 1rem);
+    width: calc(50% - 1.5rem);
   }
 
   .section-heading {

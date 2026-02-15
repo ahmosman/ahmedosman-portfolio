@@ -1,10 +1,16 @@
 <template>
   <div class="project-details">
     <div class="details-header">
-      <h2 class="project-title">{{ project.name }}</h2>
-      <div class="tech-chips">
-        <span class="tech-label">Stack:</span>
-        {{ project.technologies }}
+      <div class="title-row">
+        <h2 class="project-title">{{ project.name }}</h2>
+        <div class="info-chip release-date-chip" v-if="project['release-date']">
+          <span class="chip-label">{{ releaseDateLabel }}:</span>
+          {{ project['release-date'] }}
+        </div>
+      </div>
+      <div class="info-chip description-chip">
+        <span class="chip-label">{{ descriptionLabel }}:</span>
+        {{ project.description }}
       </div>
     </div>
 
@@ -31,32 +37,34 @@
           {{ currentDetail?.description }}
         </p>
       </transition>
-      
+
       <div class="slide-counter">
         {{ currentSlide + 1 }} / {{ details.length }}
       </div>
     </div>
+
+    <div class="info-chip" v-if="project.technologies">
+      <span class="chip-label">{{ stackLabel }}:</span>
+      {{ project.technologies }}
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { getImageUrl } from '@/services/imageService'
 
 const props = defineProps({
-  project: { type: Object, required: true }
+  project: { type: Object, required: true },
+  stackLabel: { type: String, default: 'Stack' },
+  releaseDateLabel: { type: String, default: 'Release date' },
+  descriptionLabel: { type: String, default: 'Description' }
 })
 
 const currentSlide = ref(0)
 const details = computed(() => props.project.details || [])
 const currentDetail = computed(() => details.value[currentSlide.value])
-
-function getImageUrl(imageName) {
-  try {
-    return new URL(`../../data/images/${imageName}`, import.meta.url).href
-  } catch (e) {
-    return ''
-  }
-}
 </script>
 
 <style scoped>
@@ -72,23 +80,47 @@ function getImageUrl(imageName) {
   margin-bottom: 1.5rem;
 }
 
+.title-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .project-title {
   font-size: 2.2rem;
   font-weight: 800;
-  margin-bottom: 0.5rem;
   color: #000;
+  margin: 0;
+  grid-column: 2;
+  text-align: center;
 }
 
-.tech-chips {
+.release-date-chip {
+  margin: 0;
+  white-space: nowrap;
+  grid-column: 3;
+  justify-self: end;
+}
+
+.description-chip {
+  margin: 0.5rem auto;
+}
+
+.info-chip {
   font-size: 0.95rem;
   color: #555;
   background: rgba(0, 0, 0, 0.05);
   display: inline-block;
-  padding: 0.4rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 20px;
+  margin: 0.5rem auto;
+  text-align: center;
+  line-height: 1.5;
 }
 
-.tech-label {
+.chip-label {
   font-weight: 700;
   margin-right: 5px;
   color: #333;
@@ -99,7 +131,7 @@ function getImageUrl(imageName) {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   margin-bottom: 1.5rem;
-  background: rgba(0, 0, 0, 0.1); 
+  background: rgba(0, 0, 0, 0.1);
 }
 
 :deep(.v-img__img) {
@@ -112,6 +144,7 @@ function getImageUrl(imageName) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
 .slide-description {
@@ -120,6 +153,7 @@ function getImageUrl(imageName) {
   max-width: 90%;
   margin-bottom: 1rem;
   min-height: 3.2rem;
+  color: #555;
 }
 
 .slide-counter {
@@ -139,7 +173,24 @@ function getImageUrl(imageName) {
 
 @media (max-width: 768px) {
   .project-title { font-size: 1.8rem; }
-  
+
+  .title-row {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 0.5rem;
+  }
+
+  .project-title {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .release-date-chip {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
+  }
+
   :deep(.v-carousel) {
     height: 250px !important;
   }

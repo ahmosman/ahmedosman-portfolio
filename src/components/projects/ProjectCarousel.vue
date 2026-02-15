@@ -1,14 +1,18 @@
 <template>
   <div class="carousel-container">
-    <button 
-      class="nav-arrow left" 
+    <button
+      class="nav-arrow left"
+      :style="{
+        backgroundColor: blockColor,
+        borderColor: blockColor
+      }"
       @click="scroll('left')"
     >
       &#10094;
     </button>
 
-    <div 
-      class="carousel-scroll-area" 
+    <div
+      class="carousel-scroll-area"
       ref="scrollContainer"
       @scroll="onScroll"
       @mousedown="startDrag"
@@ -18,19 +22,20 @@
     >
       <div class="spacer"></div>
 
-      <div 
-        v-for="(project, index) in projects" 
+      <div
+        v-for="(project, index) in projects"
         :key="project.id"
         class="carousel-item"
         ref="itemsRefs"
         @click="handleItemClick(index)"
       >
         <div :class="{ 'pointer-events-none': isDragging }">
-          <ProjectCard 
+          <ProjectCard
             :project="project"
             :index="index"
             :isActive="index === activeIndex"
             :blockColor="blockColor"
+            :showText="showText"
             @open="$emit('open-details', project)"
           />
         </div>
@@ -39,8 +44,12 @@
       <div class="spacer"></div>
     </div>
 
-    <button 
-      class="nav-arrow right" 
+    <button
+      class="nav-arrow right"
+      :style="{
+        backgroundColor: blockColor,
+        borderColor: blockColor
+      }"
       @click="scroll('right')"
     >
       &#10095;
@@ -54,13 +63,14 @@ import ProjectCard from './ProjectCard.vue'
 
 const props = defineProps({
   projects: { type: Array, default: () => [] },
-  blockColor: { type: String, default: '#fff' }
+  blockColor: { type: String, default: '#fff' },
+  showText: { type: String, default: 'Show' }
 })
 
 defineEmits(['open-details'])
 
 const scrollContainer = ref(null)
-const itemsRefs = ref([]) 
+const itemsRefs = ref([])
 const activeIndex = ref(0)
 
 const isMouseDown = ref(false)
@@ -68,7 +78,7 @@ const isDragging = ref(false)
 const startX = ref(0)
 const scrollLeft = ref(0)
 
-
+// Update active index based on scroll position
 function onScroll() {
   if (!scrollContainer.value) return
 
@@ -94,9 +104,10 @@ function onScroll() {
   }
 }
 
+// Scroll to specific project index
 function scrollToIndex(index) {
   if (!itemsRefs.value[index] || !scrollContainer.value) return
-  
+
   const target = itemsRefs.value[index]
   const container = scrollContainer.value
   const scrollPos = target.offsetLeft - (container.clientWidth / 2) + (target.clientWidth / 2)
@@ -107,6 +118,7 @@ function scrollToIndex(index) {
   })
 }
 
+// Navigate left or right
 function scroll(direction) {
   let newIndex = activeIndex.value + (direction === 'right' ? 1 : -1)
   if (newIndex < 0) newIndex = 0
@@ -114,21 +126,22 @@ function scroll(direction) {
   scrollToIndex(newIndex)
 }
 
+// Handle item click
 function handleItemClick(index) {
   if (!isDragging.value) {
     scrollToIndex(index)
   }
 }
 
-
+// Mouse drag handlers
 function startDrag(e) {
   if (!scrollContainer.value) return
   isMouseDown.value = true
   isDragging.value = false
-  
+
   startX.value = e.pageX - scrollContainer.value.offsetLeft
   scrollLeft.value = scrollContainer.value.scrollLeft
-  
+
   scrollContainer.value.style.scrollSnapType = 'none'
   scrollContainer.value.style.scrollBehavior = 'auto'
   scrollContainer.value.style.cursor = 'grabbing'
@@ -137,13 +150,13 @@ function startDrag(e) {
 function stopDrag() {
   if (!isMouseDown.value) return
   isMouseDown.value = false
-  
+
   if (!scrollContainer.value) return
-  
+
   scrollContainer.value.style.scrollSnapType = 'x mandatory'
   scrollContainer.value.style.scrollBehavior = 'smooth'
   scrollContainer.value.style.cursor = 'grab'
-  
+
   setTimeout(() => {
     isDragging.value = false
   }, 50)
@@ -151,12 +164,12 @@ function stopDrag() {
 
 function doDrag(e) {
   if (!isMouseDown.value || !scrollContainer.value) return
-  
+
   e.preventDefault()
-  
+
   const x = e.pageX - scrollContainer.value.offsetLeft
   const walk = (x - startX.value) * 1.5
-  
+
   if (Math.abs(walk) > 5) {
     isDragging.value = true
     scrollContainer.value.scrollLeft = scrollLeft.value - walk
@@ -174,7 +187,7 @@ onMounted(async () => {
 .carousel-container {
   position: relative;
   width: 100%;
-  height: 600px; 
+  height: 600px;
   display: flex;
   align-items: center;
 }
@@ -186,13 +199,13 @@ onMounted(async () => {
   height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  
+
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  
+
   scrollbar-width: none;
   -ms-overflow-style: none;
-  
+
   cursor: grab;
   user-select: none;
 }
@@ -205,7 +218,7 @@ onMounted(async () => {
   flex-shrink: 0;
   scroll-snap-align: center;
   padding: 0 20px;
-  width: 400px; 
+  width: 400px;
   height: 500px;
   display: flex;
   justify-content: center;
@@ -219,7 +232,7 @@ onMounted(async () => {
 
 .spacer {
   flex-shrink: 0;
-  width: calc(50vw - 220px); 
+  width: calc(50vw - 220px);
 }
 
 /* Arrows */
@@ -228,9 +241,8 @@ onMounted(async () => {
   top: 50%;
   transform: translateY(-50%);
   z-index: 20;
-  background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255,255,255,0.6);
+  border: 2px solid;
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -244,7 +256,7 @@ onMounted(async () => {
 }
 
 .nav-arrow:hover {
-  background: rgba(255, 255, 255, 0.9);
+  filter: brightness(1.1);
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -253,15 +265,15 @@ onMounted(async () => {
 
 @media (max-width: 768px) {
   .nav-arrow { display: none; }
-  
+
   .carousel-item {
-    width: 280px; 
+    width: 280px;
     height: 420px;
     padding: 0 10px;
   }
-  
+
   .spacer {
-    width: calc(50vw - 150px); 
+    width: calc(50vw - 150px);
   }
 }
 </style>

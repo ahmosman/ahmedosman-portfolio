@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="project-card" 
+  <div
+    class="project-card"
     :class="{ 'is-active': isActive, 'is-inactive': !isActive }"
     :style="{ backgroundColor: blockColor }"
   >
@@ -17,33 +17,28 @@
 
       <p class="project-description">{{ project.description }}</p>
 
-      <button 
-        class="show-btn" 
+      <button
+        class="show-btn"
         :class="{ 'btn-visible': isActive }"
         @click.stop="$emit('open', project)"
       >
-        Show
+        {{ showText }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { getImageUrl } from '@/services/imageService'
+
 defineProps({
   project: { type: Object, required: true },
   isActive: { type: Boolean, default: false },
-  blockColor: { type: String, default: 'rgba(255,255,255,0.8)' }
+  blockColor: { type: String, default: 'rgba(255,255,255,0.8)' },
+  showText: { type: String, default: 'Show' }
 })
 
 defineEmits(['open'])
-
-function getImageUrl(imageName) {
-  try {
-    return new URL(`../../data/images/${imageName}`, import.meta.url).href
-  } catch (e) {
-    return ''
-  }
-}
 </script>
 
 <style scoped>
@@ -51,7 +46,7 @@ function getImageUrl(imageName) {
   width: 100%;
   height: 100%;
   border-radius: 8px;
-  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), 
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
               opacity 0.5s ease,
               box-shadow 0.5s ease,
               filter 0.5s ease;
@@ -63,15 +58,15 @@ function getImageUrl(imageName) {
 
 .project-card.is-active {
   transform: scale(1);
-  opacity: 1;
+  opacity: 0.9;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
   z-index: 10;
   cursor: default;
 }
 
 .project-card.is-inactive {
-  transform: scale(0.85); 
-  opacity: 0.6;
+  transform: scale(0.85);
+  opacity: 0.5;
   filter: grayscale(40%);
   cursor: pointer;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
@@ -138,27 +133,23 @@ function getImageUrl(imageName) {
   align-self: center;
   padding: 0.8rem 2.5rem;
   background: transparent;
-  border: 2px solid #333;
-  color: #333;
+  border: 2px solid #606187;
+  color: #606187;
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
   font-size: 0.9rem;
-  
   opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
   transition: all 0.4s ease;
 }
 
 .show-btn.btn-visible {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
 }
 
 .show-btn:hover {
-  background: #333;
+  background: #606187;
   color: #fff;
 }
 

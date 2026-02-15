@@ -219,6 +219,7 @@ onUnmounted(() => {
 
 /* Two Column Layout */
 .experience-flex-container {
+  flex: 1;
   display: flex;
   flex-direction: row;
   gap: 4rem;
