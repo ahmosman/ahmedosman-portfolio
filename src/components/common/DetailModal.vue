@@ -5,24 +5,12 @@
         <div class="modal-content" :style="{ backgroundColor: backgroundColor }" @click.stop>
           <div class="modal-header">
             <div class="header-links">
-              <a
-                v-if="projectLink"
-                :href="projectLink"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="icon-link"
-                title="View Project"
-              >
+              <a v-if="projectLink" :href="projectLink" target="_blank" rel="noopener noreferrer" class="icon-link"
+                title="View Project">
                 <span class="mdi mdi-open-in-new"></span>
               </a>
-              <a
-                v-if="githubLink"
-                :href="githubLink"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="icon-link"
-                title="View on GitHub"
-              >
+              <a v-if="githubLink" :href="githubLink" target="_blank" rel="noopener noreferrer" class="icon-link"
+                title="View on GitHub">
                 <span class="mdi mdi-github"></span>
               </a>
             </div>
@@ -33,25 +21,13 @@
             <slot></slot>
           </div>
 
-          <div class="mobile-footer-links">
-            <a
-              v-if="projectLink"
-              :href="projectLink"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="footer-link"
-              title="View Project"
-            >
+          <div class="mobile-footer-links" v-if="projectLink || githubLink">
+            <a v-if="projectLink" :href="projectLink" target="_blank" rel="noopener noreferrer" class="footer-link"
+              title="View Project">
               <span class="mdi mdi-open-in-new"></span>
             </a>
-            <a
-              v-if="githubLink"
-              :href="githubLink"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="footer-link"
-              title="View on GitHub"
-            >
+            <a v-if="githubLink" :href="githubLink" target="_blank" rel="noopener noreferrer" class="footer-link"
+              title="View on GitHub">
               <span class="mdi mdi-github"></span>
             </a>
           </div>
@@ -123,7 +99,7 @@ function close() {
   left: 1.5rem;
   right: 1.5rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   z-index: 10;
 }
@@ -163,6 +139,11 @@ function close() {
 
 .close-btn:hover {
   transform: scale(1.1);
+}
+
+.modal-body {
+  width: 100%;
+  padding-top: 2rem;
 }
 
 .mobile-footer-links {
@@ -233,6 +214,10 @@ function close() {
 
   .footer-link .mdi {
     font-size: 1.5rem;
+  }
+
+  .modal-content {
+    padding: 3rem 1.5rem;
   }
 }
 </style>

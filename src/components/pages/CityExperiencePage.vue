@@ -8,29 +8,16 @@
 
       <div class="experience-flex-container" ref="containerRef">
         <div class="left-column">
-          <div
-            v-for="section in sections"
-            :key="section.id"
-            class="content-block"
-            :style="{ backgroundColor: blockColor }"
-          >
+          <div v-for="section in sections" :key="section.id" class="content-block"
+            :style="{ backgroundColor: blockColor }">
             <h3 class="block-heading">{{ section.name }}</h3>
 
-            <div
-              v-for="institution in section.institutions"
-              :key="institution.id"
-              class="institution-group"
-            >
+            <div v-for="institution in section.institutions" :key="institution.id" class="institution-group">
               <h4 class="institution-name">{{ institution.name }}</h4>
 
               <div class="items-list">
-                <div
-                  v-for="item in institution.items"
-                  :key="item.id"
-                  class="item-row"
-                  :class="{ active: selectedItemId === item.id }"
-                  @click="selectItem(item.id, institution.name)"
-                >
+                <div v-for="item in institution.items" :key="item.id" class="item-row"
+                  :class="{ active: selectedItemId === item.id }" @click="selectItem(item.id, institution.name)">
                   <span class="item-period">{{ item.period }}</span>
                   <span class="item-title">{{ item.title }}</span>
                 </div>
@@ -40,20 +27,15 @@
         </div>
 
         <div class="right-column" v-if="!isMobile">
-          <div
-            class="content-block detail-block-content"
-            ref="floatingBlockRef"
-            :style="{
-              transform: `translate3d(0, ${floatingY}px, 0)`,
-              backgroundColor: blockColor,
-            }"
-          >
+          <div class="content-block detail-block-content" ref="floatingBlockRef" :style="{
+            transform: `translate3d(0, ${floatingY}px, 0)`,
+            backgroundColor: blockColor,
+          }">
             <div v-if="selectedItem">
               <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
               <h4 class="detail-job-title">{{ selectedItem.title }}</h4>
-              <div class="detail-body">
-                <p>{{ selectedItem.description }}</p>
-              </div>
+
+              <div class="detail-body" ref="detailScrollRef" v-html="selectedItem.description"></div>
             </div>
             <div v-else class="placeholder-state">
               <p>Select an item from the left to view details</p>
@@ -62,17 +44,11 @@
         </div>
       </div>
 
-      <DetailModal
-        :is-open="isMobile && showModal"
-        :background-color="blockColor"
-        @close="closeModal"
-      >
+      <DetailModal :is-open="isMobile && showModal" :background-color="blockColor" @close="closeModal">
         <div v-if="selectedItem">
           <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
           <h4 class="detail-job-title">{{ selectedItem.title }}</h4>
-          <div class="detail-body">
-            <p>{{ selectedItem.description }}</p>
-          </div>
+          <div class="detail-body" v-html="selectedItem.description"></div>
         </div>
       </DetailModal>
     </div>
@@ -81,7 +57,8 @@
 
 <script setup>
 import '@/assets/pages-common.css'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+// DODANO nextTick do importów
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useDataStore } from '@/stores'
 import { useScrollBackground } from '@/composables/useScrollColor'
 import DetailModal from '@/components/common/DetailModal.vue'
@@ -95,12 +72,14 @@ const sections = computed(() => dataStore.getExperienceSections)
 const selectedItemId = ref(null)
 const selectedItem = ref(null)
 const selectedInstitutionName = ref('')
+// DODANO ref do kontenera z tekstem
+const detailScrollRef = ref(null)
 
 const isMobile = ref(false)
 const showModal = ref(false)
 const MOBILE_BREAKPOINT = 1100
 
-// --- Color (no changes) ---
+// --- Color ---
 const { backgroundColor } = useScrollBackground()
 
 const blockColor = computed(() => {
@@ -108,10 +87,7 @@ const blockColor = computed(() => {
   if (!hex) return 'rgba(164, 200, 221, 0.85)'
   let cleanHex = hex.substring(1)
   if (cleanHex.length === 3)
-    cleanHex = cleanHex
-      .split('')
-      .map((c) => c + c)
-      .join('')
+    cleanHex = cleanHex.split('').map((c) => c + c).join('')
   const num = parseInt(cleanHex, 16)
   let r = (num >> 16) & 255,
     g = (num >> 8) & 255,
@@ -120,7 +96,7 @@ const blockColor = computed(() => {
   return `rgba(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)}, 0.85)`
 })
 
-// --- Animation (no changes) ---
+// --- Animation ---
 const containerRef = ref(null)
 const floatingBlockRef = ref(null)
 const floatingY = ref(0)
@@ -154,7 +130,6 @@ function animateFloatingBlock() {
 
 // --- Helpers ---
 function getItemById(id) {
-  // Helper function to search in Pinia store data
   for (const section of sections.value) {
     for (const inst of section.institutions) {
       const found = inst.items.find((i) => i.id === id)
@@ -175,7 +150,16 @@ function selectItem(itemId, institutionName) {
   selectedItemId.value = itemId
   selectedItem.value = getItemById(itemId)
   selectedInstitutionName.value = institutionName
-  if (isMobile.value) showModal.value = true
+
+  if (isMobile.value) {
+    showModal.value = true
+  } else {
+    nextTick(() => {
+      if (detailScrollRef.value) {
+        detailScrollRef.value.scrollTop = 0
+      }
+    })
+  }
 }
 
 function closeModal() {
@@ -188,12 +172,10 @@ onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
 
-  // Load data through Pinia
   if (!dataStore.isDataLoaded) {
     dataStore.loadAllData()
   }
 
-  // Auto-select after data is loaded (desktop only)
   if (!isMobile.value && sections.value.length > 0) {
     const firstInst = sections.value[0].institutions[0]
     if (firstInst && firstInst.items.length > 0) {
@@ -219,7 +201,6 @@ onUnmounted(() => {
 
 /* Two Column Layout */
 .experience-flex-container {
-  flex: 1;
   display: flex;
   flex-direction: row;
   gap: 4rem;
@@ -246,9 +227,7 @@ onUnmounted(() => {
   min-height: 500px;
 }
 
-/* ============================
-   Section Typography
-   ============================ */
+/* Typography */
 .block-heading {
   font-size: 2.5rem;
   font-weight: 700;
@@ -267,9 +246,7 @@ onUnmounted(() => {
   color: #111;
 }
 
-/* ============================
-   Item List
-   ============================ */
+/* Item List */
 .items-list {
   display: flex;
   flex-direction: column;
@@ -305,9 +282,6 @@ onUnmounted(() => {
   color: #000;
 }
 
-/* ============================
-   Detail Block Content
-   ============================ */
 .detail-institution {
   font-size: 2.5rem;
   font-weight: 800;
@@ -328,7 +302,28 @@ onUnmounted(() => {
   font-size: 1.3rem;
   line-height: 1.8;
   color: #111;
-  white-space: pre-line;
+
+  max-height: calc(75vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.detail-body :deep(ul) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.detail-body :deep(li) {
+  flex: 0 1 auto;
+  max-width: 100%;
+
+  padding: 0.3rem 0.8rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 .placeholder-state {
@@ -342,21 +337,6 @@ onUnmounted(() => {
   min-height: 300px;
 }
 
-.close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  background: transparent;
-  border: none;
-  font-size: 2rem;
-  color: #333;
-  cursor: pointer;
-  line-height: 1;
-  padding: 5px;
-  z-index: 10;
-}
-
-/* Fade Transition for Modal */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -367,7 +347,7 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 1800px) {
   .block-heading {
     font-size: 2rem;
