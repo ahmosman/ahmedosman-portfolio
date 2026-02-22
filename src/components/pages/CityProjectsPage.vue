@@ -74,9 +74,7 @@ function closeModal() {
   setTimeout(() => { selectedProject.value = null }, 300)
 }
 
-onMounted(() => {
-  if (!dataStore.isDataLoaded) dataStore.loadAllData()
-})
+
 </script>
 
 <style scoped>

@@ -81,11 +81,7 @@ const selectItem = (index) => {
   activeIndex.value = index
 }
 
-onMounted(() => {
-  if (!dataStore.isDataLoaded || items.value.length === 0) {
-    dataStore.loadAllData()
-  }
-})
+
 </script>
 
 <style scoped>

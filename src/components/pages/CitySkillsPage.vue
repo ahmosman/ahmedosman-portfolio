@@ -102,11 +102,7 @@ function getIconUrl(name) {
   return new URL(`../../assets/icons/${name}`, import.meta.url).href
 }
 
-onMounted(() => {
-  if (!dataStore.isDataLoaded) {
-    dataStore.loadAllData()
-  }
-})
+
 </script>
 
 <style scoped>

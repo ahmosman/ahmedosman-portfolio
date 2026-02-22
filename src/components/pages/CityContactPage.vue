@@ -129,11 +129,7 @@ const getFileUrl = (path) => {
   return FILE_URL_MAP[path] ?? ''
 }
 
-onMounted(() => {
-  if (!dataStore.isDataLoaded) {
-    dataStore.loadAllData()
-  }
-})
+
 </script>
 
 <style scoped>

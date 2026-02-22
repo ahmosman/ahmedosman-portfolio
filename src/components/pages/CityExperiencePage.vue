@@ -172,10 +172,6 @@ onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
 
-  if (!dataStore.isDataLoaded) {
-    dataStore.loadAllData()
-  }
-
   if (!isMobile.value && sections.value.length > 0) {
     const firstInst = sections.value[0].institutions[0]
     if (firstInst && firstInst.items.length > 0) {

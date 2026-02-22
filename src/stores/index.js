@@ -1,43 +1,63 @@
 import { defineStore } from 'pinia'
-import experienceData from '@/data/experience.json'
-import skillsData from '@/data/skills.json'
-import mainData from '@/data/main.json'
-import projectsData from '@/data/projects.json'
-import aboutData from '@/data/about.json'
-import contactData from '@/data/contact.json'
+
+// English data
+import experienceDataEn from '@/data/en/experience.json'
+import skillsDataEn from '@/data/en/skills.json'
+import mainDataEn from '@/data/en/main.json'
+import projectsDataEn from '@/data/en/projects.json'
+import aboutDataEn from '@/data/en/about.json'
+import contactDataEn from '@/data/en/contact.json'
+
+// Polish data
+import experienceDataPl from '@/data/pl/experience.json'
+import skillsDataPl from '@/data/pl/skills.json'
+import mainDataPl from '@/data/pl/main.json'
+import projectsDataPl from '@/data/pl/projects.json'
+import aboutDataPl from '@/data/pl/about.json'
+import contactDataPl from '@/data/pl/contact.json'
+
+const allData = {
+  en: {
+    experience: experienceDataEn,
+    skills: skillsDataEn,
+    main: mainDataEn,
+    projects: projectsDataEn,
+    about: aboutDataEn,
+    contact: contactDataEn,
+  },
+  pl: {
+    experience: experienceDataPl,
+    skills: skillsDataPl,
+    main: mainDataPl,
+    projects: projectsDataPl,
+    about: aboutDataPl,
+    contact: contactDataPl,
+  },
+}
 
 export const useDataStore = defineStore('data', {
   state: () => ({
-    experience: {},
-    skills: {},
-    main: {},
-    projects: {},
-    about: {},
-    contact: {},
-    isDataLoaded: false,
+    language: 'en',
   }),
   getters: {
-    getExperiencePage: (state) => state.experience.page || {},
-    getExperienceSections: (state) => state.experience.sections || [],
-    getSkillsPage: (state) => state.skills.page || {},
-    getSkillsSections: (state) => state.skills.sections || [],
-    getMainPage: (state) => state.main.page || {},
-    getProjectsPage: (state) => state.projects.page || {},
-    getProjectsList: (state) => state.projects.sections || [],
-    getAboutPage: (state) => state.about.page || {},
-    getAboutSections: (state) => state.about.sections || [],
-    getContactPage: (state) => state.contact.page || {},
-    getContactSections: (state) => state.contact.sections || [],
+    getExperiencePage: (state) => allData[state.language]?.experience?.page || {},
+    getExperienceSections: (state) => allData[state.language]?.experience?.sections || [],
+    getSkillsPage: (state) => allData[state.language]?.skills?.page || {},
+    getSkillsSections: (state) => allData[state.language]?.skills?.sections || [],
+    getMainPage: (state) => allData[state.language]?.main?.page || {},
+    getNavSections: (state) => allData[state.language]?.main?.nav || [],
+    getProjectsPage: (state) => allData[state.language]?.projects?.page || {},
+    getProjectsList: (state) => allData[state.language]?.projects?.sections || [],
+    getAboutPage: (state) => allData[state.language]?.about?.page || {},
+    getAboutSections: (state) => allData[state.language]?.about?.sections || [],
+    getContactPage: (state) => allData[state.language]?.contact?.page || {},
+    getContactSections: (state) => allData[state.language]?.contact?.sections || [],
   },
   actions: {
-    loadAllData() {
-      this.experience = experienceData
-      this.skills = skillsData
-      this.main = mainData
-      this.projects = projectsData
-      this.about = aboutData
-      this.contact = contactData
-      this.isDataLoaded = true
+    setLanguage(lang) {
+      if (allData[lang]) {
+        this.language = lang
+      }
     },
   },
 })

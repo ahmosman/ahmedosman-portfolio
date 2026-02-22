@@ -22,11 +22,7 @@ import { useDataStore } from '@/stores'
 const dataStore = useDataStore()
 const pageData = computed(() => dataStore.getMainPage)
 
-onMounted(() => {
-  if (!dataStore.isDataLoaded) {
-    dataStore.loadAllData()
-  }
-})
+
 </script>
 
 <style scoped>

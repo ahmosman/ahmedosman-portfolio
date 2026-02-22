@@ -1,8 +1,10 @@
 ﻿<script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useScrollBackground } from '@/composables/useScrollColor'
+import { useDataStore } from '@/stores'
 
 const { backgroundColor } = useScrollBackground()
+const dataStore = useDataStore()
 
 const getAdjustedColor = (hexValue, darkenFactor, alpha) => {
   const hex = hexValue || '#E3C8AA'
@@ -17,15 +19,22 @@ const getAdjustedColor = (hexValue, darkenFactor, alpha) => {
 
 const menuItemColor = computed(() => getAdjustedColor(backgroundColor.value, 0.9, 0.55))
 const menuItemActiveColor = computed(() => getAdjustedColor(backgroundColor.value, 0.85, 0.75))
+const langMenuBgColor = computed(() => getAdjustedColor(backgroundColor.value, 0.78, 0.72))
 
-const sections = [
-  { id: 'main-page', label: 'Main Page' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'about', label: 'About' },
-  { id: 'contact', label: 'Contact' },
+// Nav sections from store (reactive to language change)
+const sections = computed(() => dataStore.getNavSections)
+
+// Language switcher
+const languages = [
+  { code: 'en', label: 'English' },
+  { code: 'pl', label: 'Polski' },
 ]
+const langMenuOpen = ref(false)
+
+const switchLanguage = (code) => {
+  dataStore.setLanguage(code)
+  langMenuOpen.value = false
+}
 
 const drawer = ref(false)
 const isOpen = ref(false)
@@ -57,10 +66,10 @@ const smoothScrollToElement = (target, duration = 800) => {
 }
 
 /**
- * Natychmiastowe zamykanie menu i przewijanie
+ * Close menu and scroll to section
  */
 const scrollToSection = (sectionId) => {
-  closeMenu() // Znika od razu
+  closeMenu()
   const element = document.getElementById(sectionId)
   if (element) {
     smoothScrollToElement(element, 800)
@@ -68,14 +77,13 @@ const scrollToSection = (sectionId) => {
 }
 
 const openMenu = () => {
-  drawer.value = true // Renderuje element w DOM
+  drawer.value = true
   setTimeout(() => {
-    isOpen.value = true // Odpala animacje wejścia
+    isOpen.value = true
   }, 20)
 }
 
 const closeMenu = () => {
-  // Usuwa menu natychmiastowo
   isOpen.value = false
   drawer.value = false
 }
@@ -86,16 +94,15 @@ const toggleMenu = () => {
 }
 
 /**
- * Uproszczone wykrywanie aktywnej sekcji na żywo
+ * Detect active section on scroll
  */
 const updateActiveSection = () => {
   const scrollPosition = window.scrollY + window.innerHeight / 3
 
-  // Szukamy od dołu, pierwsza która pasuje jest tą właściwą
-  for (let i = sections.length - 1; i >= 0; i--) {
-    const el = document.getElementById(sections[i].id)
+  for (let i = sections.value.length - 1; i >= 0; i--) {
+    const el = document.getElementById(sections.value[i].id)
     if (el && scrollPosition >= el.offsetTop) {
-      activeSection.value = sections[i].id
+      activeSection.value = sections.value[i].id
       return
     }
   }
@@ -113,15 +120,36 @@ onUnmounted(() => {
 
 <template>
   <v-app-bar app elevation="0" class="app-bar">
-    <v-spacer class="hidden-sm-and-down" />
+    <!-- Language button – always on the left, desktop & mobile -->
+    <v-menu v-model="langMenuOpen" location="bottom start" :close-on-content-click="false">
+      <template #activator="{ props: menuProps }">
+        <v-btn variant="text" v-bind="menuProps" class="lang-nav-btn">
+          <v-icon>mdi-translate</v-icon>
+        </v-btn>
+      </template>
+      <v-list class="lang-list" density="compact" :style="{ backgroundColor: langMenuBgColor }">
+        <v-list-item
+          v-for="lang in languages"
+          :key="lang.code"
+          @click="switchLanguage(lang.code)"
+          :class="{ 'lang-active': dataStore.language === lang.code }"
+          rounded="lg"
+        >
+          <v-list-item-title class="lang-list-item-title">{{ lang.label }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
+    <v-spacer />
+
+    <!-- Desktop nav buttons -->
     <template v-for="section in sections" :key="section.id">
       <v-btn variant="text" @click="scrollToSection(section.id)" class="nav-btn hidden-sm-and-down">
         {{ section.label }}
       </v-btn>
     </template>
 
-    <v-spacer class="hidden-md-and-up" />
-
+    <!-- Mobile hamburger button -->
     <v-btn icon @click="toggleMenu" class="hamburger-btn hidden-md-and-up" style="z-index: 2000">
       <div class="hamburger" :class="{ active: isOpen }">
         <span></span>
@@ -131,6 +159,7 @@ onUnmounted(() => {
     </v-btn>
   </v-app-bar>
 
+  <!-- Mobile fullscreen menu -->
   <div v-if="drawer" class="mobile-menu" :class="{ 'active': isOpen }" @click="closeMenu">
     <div class="mobile-menu-content" @click.stop>
       <div class="mobile-menu-list">
@@ -139,11 +168,12 @@ onUnmounted(() => {
             'active': isOpen,
             'is-current': activeSection === section.id
           }" :style="[
-            { transitionDelay: `${index * 0.08}s` }, /* Tylko proste opóźnienie */
+            { transitionDelay: `${index * 0.08}s` },
             { backgroundColor: activeSection === section.id ? menuItemActiveColor : menuItemColor }
           ]">
           {{ section.label }}
         </div>
+
       </div>
     </div>
   </div>
@@ -151,12 +181,12 @@ onUnmounted(() => {
 
 <style scoped>
 .app-bar {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.1);
   transition: background-color 0.3s ease;
 }
 
 .nav-btn {
-  color: #111 !important;
+  color: #111;
   font-weight: 500;
   text-transform: none;
   letter-spacing: 0.5px;
@@ -305,23 +335,69 @@ onUnmounted(() => {
   filter: brightness(1.1);
 }
 
+/* ── Language switcher ── */
+.lang-nav-btn {
+  color: #111;
+  font-weight: 500;
+  height: 100%;
+  border-radius: 0;
+  transition: background-color 0.3s ease;
+  min-width: 48px;
+}
+
+.lang-nav-btn:hover {
+  backdrop-filter: blur(10px);
+}
+
+.lang-list {
+  min-width: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.lang-list-item-title {
+  font-size: 1.15rem;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+:deep(.lang-list .v-list-item) {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  padding-left: 20px;
+  padding-right: 20px;
+  min-height: 56px;
+}
+
+:deep(.lang-active) {
+  background-color: rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+}
+
+:deep(.lang-active .lang-list-item-title) {
+  font-weight: 700;
+}
+
 @media (max-width: 959px) {
   .hidden-md-and-up {
-    display: flex !important;
+    display: flex;
   }
 
   .hidden-sm-and-down {
-    display: none !important;
+    display: none;
   }
 }
 
 @media (min-width: 960px) {
   .hidden-md-and-up {
-    display: none !important;
+    display: none;
   }
 
   .hidden-sm-and-down {
-    display: flex !important;
+    display: flex;
   }
 }
 </style>
