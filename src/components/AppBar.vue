@@ -1,5 +1,22 @@
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+﻿<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useScrollBackground } from '@/composables/useScrollColor'
+
+const { backgroundColor } = useScrollBackground()
+
+const getAdjustedColor = (hexValue, darkenFactor, alpha) => {
+  const hex = hexValue || '#E3C8AA'
+  let cleanHex = hex.substring(1)
+  if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c + c).join('')
+  const num = parseInt(cleanHex, 16)
+  const r = Math.floor(((num >> 16) & 255) * darkenFactor)
+  const g = Math.floor(((num >> 8) & 255) * darkenFactor)
+  const b = Math.floor((num & 255) * darkenFactor)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+const menuItemColor = computed(() => getAdjustedColor(backgroundColor.value, 0.9, 0.55))
+const menuItemActiveColor = computed(() => getAdjustedColor(backgroundColor.value, 0.85, 0.75))
 
 const sections = [
   { id: 'main-page', label: 'Main Page' },
@@ -15,18 +32,15 @@ const isOpen = ref(false)
 const activeSection = ref('main-page')
 
 /**
- * Custom Smooth Scroll Function
+ * Custom Smooth Scroll
  */
-const smoothScrollToElement = (target, duration = 1000) => {
+const smoothScrollToElement = (target, duration = 800) => {
   const targetPosition = target.getBoundingClientRect().top + window.scrollY
   const startPosition = window.scrollY
   const distance = targetPosition - startPosition
   let startTime = null
 
-  // Easing function: easeInOutCubic
-  const ease = (t) => {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
-  }
+  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
   const animation = (currentTime) => {
     if (startTime === null) startTime = currentTime
@@ -39,81 +53,57 @@ const smoothScrollToElement = (target, duration = 1000) => {
       requestAnimationFrame(animation)
     }
   }
-
   requestAnimationFrame(animation)
 }
 
 /**
- * MODIFIED NAVIGATION FUNCTION
- * Triggers menu closing and scrolling simultaneously
+ * Natychmiastowe zamykanie menu i przewijanie
  */
 const scrollToSection = (sectionId) => {
-  // 1. If menu is open, close it
-  if (drawer.value) {
-    closeMenu()
-  }
-
-  // 2. Find element and start scrolling IMMEDIATELY (no waiting/delay)
+  closeMenu() // Znika od razu
   const element = document.getElementById(sectionId)
   if (element) {
-    // Scroll for 1000ms. Since the menu is semi-transparent,
-    // user will see the moving background under the disappearing menu.
-    smoothScrollToElement(element, 1000)
+    smoothScrollToElement(element, 800)
   }
 }
 
 const openMenu = () => {
-  drawer.value = true
+  drawer.value = true // Renderuje element w DOM
   setTimeout(() => {
-    isOpen.value = true
+    isOpen.value = true // Odpala animacje wejścia
   }, 20)
 }
 
 const closeMenu = () => {
+  // Usuwa menu natychmiastowo
   isOpen.value = false
-  const totalDuration = sections.length * 80 + 400
-  setTimeout(() => {
-    drawer.value = false
-  }, totalDuration)
+  drawer.value = false
 }
 
 const toggleMenu = () => {
-  if (isOpen.value) {
-    closeMenu()
-  } else {
-    openMenu()
-  }
-}
-
-const getItemStyle = (index) => {
-  const delay = isOpen.value ? index * 0.08 : (sections.length - 1 - index) * 0.08
-
-  return {
-    transitionDelay: `${delay}s`,
-  }
+  if (drawer.value) closeMenu()
+  else openMenu()
 }
 
 /**
- * Detect which section is currently visible
+ * Uproszczone wykrywanie aktywnej sekcji na żywo
  */
 const updateActiveSection = () => {
   const scrollPosition = window.scrollY + window.innerHeight / 3
 
+  // Szukamy od dołu, pierwsza która pasuje jest tą właściwą
   for (let i = sections.length - 1; i >= 0; i--) {
-    const element = document.getElementById(sections[i].id)
-    if (element) {
-      const offsetTop = element.offsetTop
-      if (scrollPosition >= offsetTop) {
-        activeSection.value = sections[i].id
-        return
-      }
+    const el = document.getElementById(sections[i].id)
+    if (el && scrollPosition >= el.offsetTop) {
+      activeSection.value = sections[i].id
+      return
     }
   }
 }
 
 onMounted(() => {
   updateActiveSection()
-  window.addEventListener('scroll', updateActiveSection)
+  window.addEventListener('scroll', updateActiveSection, { passive: true })
 })
 
 onUnmounted(() => {
@@ -141,17 +131,17 @@ onUnmounted(() => {
     </v-btn>
   </v-app-bar>
 
-  <div v-if="drawer" class="mobile-menu" :class="{ active: isOpen }" @click="closeMenu">
+  <div v-if="drawer" class="mobile-menu" :class="{ 'active': isOpen }" @click="closeMenu">
     <div class="mobile-menu-content" @click.stop>
       <div class="mobile-menu-list">
-        <div
-          v-for="(section, index) in sections"
-          :key="section.id"
-          @click="scrollToSection(section.id)"
-          class="mobile-menu-item"
-          :class="{ active: isOpen, 'is-current': activeSection === section.id }"
-          :style="getItemStyle(index)"
-        >
+        <div v-for="(section, index) in sections" :key="section.id" @click="scrollToSection(section.id)"
+          class="mobile-menu-item" :class="{
+            'active': isOpen,
+            'is-current': activeSection === section.id
+          }" :style="[
+            { transitionDelay: `${index * 0.08}s` }, /* Tylko proste opóźnienie */
+            { backgroundColor: activeSection === section.id ? menuItemActiveColor : menuItemColor }
+          ]">
           {{ section.label }}
         </div>
       </div>
@@ -160,10 +150,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* ===================================
-   APP BAR STYLES
-   =================================== */
-
 .app-bar {
   background: rgba(255, 255, 255, 0.1) !important;
   transition: background-color 0.3s ease;
@@ -185,23 +171,17 @@ onUnmounted(() => {
   backdrop-filter: blur(10px);
 }
 
-/* Larger navigation buttons for tablets */
 @media (min-width: 768px) {
   .nav-btn {
     font-size: 1rem;
   }
 }
 
-/* Even larger navigation buttons for desktops */
 @media (min-width: 1024px) {
   .nav-btn {
     font-size: 1.1rem;
   }
 }
-
-/* ===================================
-   HAMBURGER ICON ANIMATION
-   =================================== */
 
 .hamburger-btn {
   width: 48px;
@@ -230,18 +210,18 @@ onUnmounted(() => {
   transition: 0.25s ease-in-out;
 }
 
-/* Initial positions */
 .hamburger span:nth-child(1) {
   top: 0px;
 }
+
 .hamburger span:nth-child(2) {
   top: 8px;
 }
+
 .hamburger span:nth-child(3) {
   top: 16px;
 }
 
-/* Transform to X when active */
 .hamburger.active span:nth-child(1) {
   top: 8px;
   transform: rotate(135deg);
@@ -257,10 +237,6 @@ onUnmounted(() => {
   transform: rotate(-135deg);
 }
 
-/* ===================================
-   MOBILE FULL-SCREEN MENU
-   =================================== */
-
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -271,29 +247,16 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Initial state (closed): Transparent, no blur */
   background: rgba(255, 255, 255, 0);
-  backdrop-filter: blur(0px);
-  pointer-events: none;
-
-  /* Smooth transitions for background and blur */
-  transition:
-    background 0.4s ease,
-    backdrop-filter 0.4s ease;
-
-  /* Delay on closing so background fades last */
-  transition-delay: 0.4s;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-/* Active state (open): Semi-transparent with blur effect */
 .mobile-menu.active {
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  pointer-events: auto;
-
-  /* No delay when opening - background appears immediately */
-  transition-delay: 0s;
+  opacity: 1;
 }
 
 .mobile-menu-content {
@@ -308,10 +271,6 @@ onUnmounted(() => {
   gap: 15px;
 }
 
-/* ===================================
-   MENU ITEMS WITH STAIR ANIMATION
-   =================================== */
-
 .mobile-menu-item {
   padding: 24px 32px;
   font-size: 1.5rem;
@@ -319,52 +278,38 @@ onUnmounted(() => {
   color: #111;
   text-align: center;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
   border-radius: 12px;
-
-  /* Initial state (closed): Hidden above viewport */
   opacity: 0;
   transform: translateY(-30px);
 
-  /* Smooth transitions for all properties */
+  /* Płynne wejście */
   transition:
     opacity 0.4s cubic-bezier(0.25, 0.8, 0.5, 1),
     transform 0.4s cubic-bezier(0.25, 0.8, 0.5, 1),
     background-color 0.3s ease,
     box-shadow 0.3s ease;
-
-  /* Note: Individual transition delays are set inline via :style */
 }
 
-/* Active state (open): Visible at original position */
 .mobile-menu-item.active {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Current section highlighting */
 .mobile-menu-item.is-current {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(5px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Hover effect */
 .mobile-menu-item:hover {
-  background: rgba(255, 255, 255, 0.6);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: scale(1.02) translateY(0);
+  transform: scale(1.02);
+  filter: brightness(1.1);
 }
-
-/* ===================================
-   RESPONSIVE BREAKPOINTS
-   =================================== */
 
 @media (max-width: 959px) {
   .hidden-md-and-up {
     display: flex !important;
   }
+
   .hidden-sm-and-down {
     display: none !important;
   }
@@ -374,6 +319,7 @@ onUnmounted(() => {
   .hidden-md-and-up {
     display: none !important;
   }
+
   .hidden-sm-and-down {
     display: flex !important;
   }
