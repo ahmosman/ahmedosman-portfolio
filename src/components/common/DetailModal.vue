@@ -7,14 +7,16 @@
             <div class="header-links">
               <a v-if="projectLink" :href="projectLink" target="_blank" rel="noopener noreferrer" class="icon-link"
                 title="View Project">
-                <span class="mdi mdi-open-in-new"></span>
+                <svg-icon type="mdi" :path="mdiOpenInNew" />
               </a>
               <a v-if="githubLink" :href="githubLink" target="_blank" rel="noopener noreferrer" class="icon-link"
                 title="View on GitHub">
-                <span class="mdi mdi-github"></span>
+                <svg-icon type="mdi" :path="mdiGithub" />
               </a>
             </div>
-            <button class="close-btn" @click="close">&times;</button>
+            <button class="close-btn" @click="close">
+              <svg-icon type="mdi" :path="mdiClose" />
+            </button>
           </div>
 
           <div class="modal-body">
@@ -24,11 +26,11 @@
           <div class="mobile-footer-links" v-if="projectLink || githubLink">
             <a v-if="projectLink" :href="projectLink" target="_blank" rel="noopener noreferrer" class="footer-link"
               title="View Project">
-              <span class="mdi mdi-open-in-new"></span>
+              <svg-icon type="mdi" :path="mdiOpenInNew" />
             </a>
             <a v-if="githubLink" :href="githubLink" target="_blank" rel="noopener noreferrer" class="footer-link"
               title="View on GitHub">
-              <span class="mdi mdi-github"></span>
+              <svg-icon type="mdi" :path="mdiGithub" />
             </a>
           </div>
         </div>
@@ -38,6 +40,9 @@
 </template>
 
 <script setup>
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiOpenInNew, mdiGithub, mdiClose } from '@mdi/js'
+
 defineProps({
   isOpen: {
     type: Boolean,
@@ -95,7 +100,7 @@ function close() {
 
 .modal-header {
   position: absolute;
-  top: 1rem;
+  top: 1.75rem;
   left: 1.5rem;
   right: 1.5rem;
   display: flex;
@@ -106,19 +111,24 @@ function close() {
 
 .header-links {
   display: flex;
+  margin: 1rem;
   gap: 1rem;
 }
 
 .icon-link {
   background: transparent;
   border: none;
-  font-size: 1.8rem;
   color: #555;
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.2s, color 0.2s;
   display: flex;
   align-items: center;
+}
+
+.icon-link svg {
+  width: 2.2rem;
+  height: 2.2rem;
 }
 
 .icon-link:hover {
@@ -129,12 +139,17 @@ function close() {
 .close-btn {
   background: transparent;
   border: none;
-  font-size: 2.5rem;
-  color: #333;
+  color: #555;
   cursor: pointer;
-  line-height: 1;
   padding: 0;
   transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.close-btn svg {
+  width: 2.2rem;
+  height: 2.2rem;
 }
 
 .close-btn:hover {
@@ -212,8 +227,9 @@ function close() {
     transform: scale(1.1);
   }
 
-  .footer-link .mdi {
-    font-size: 1.5rem;
+  .footer-link svg {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 
   .modal-content {
