@@ -173,6 +173,7 @@ const getFileUrl = (path) => {
   align-items: center;
   text-align: center;
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+  container-type: inline-size;
 }
 
 .contact-card:hover {
@@ -186,11 +187,13 @@ const getFileUrl = (path) => {
 }
 
 .card-text {
-  font-size: 1.1rem;
+  font-size: clamp(0.7rem, 7cqw, 1.1rem);
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 1.5rem;
-  word-break: break-word;
+  word-break: keep-all;
+  white-space: nowrap;
+  max-width: 100%;
   flex-grow: 1;
 }
 
