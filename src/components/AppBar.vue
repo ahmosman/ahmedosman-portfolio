@@ -123,16 +123,25 @@ onUnmounted(() => {
     <!-- Language button – always on the left, desktop & mobile -->
     <v-menu v-model="langMenuOpen" location="bottom start" :close-on-content-click="false">
       <template #activator="{ props: menuProps }">
-        <v-btn variant="text" v-bind="menuProps" class="lang-nav-btn">
-          <v-icon>mdi-translate</v-icon>
+        <v-btn
+          variant="text"
+          v-bind="menuProps"
+          class="lang-nav-btn"
+          :aria-label="'Select language, current: ' + (dataStore.language === 'en' ? 'English' : 'Polski')"
+          :aria-expanded="String(langMenuOpen)"
+          aria-haspopup="listbox"
+        >
+          <v-icon aria-hidden="true">mdi-translate</v-icon>
         </v-btn>
       </template>
-      <v-list class="lang-list" density="compact" :style="{ backgroundColor: langMenuBgColor }">
+      <v-list class="lang-list" density="compact" :style="{ backgroundColor: langMenuBgColor }" role="listbox" aria-label="Language selection">
         <v-list-item
           v-for="lang in languages"
           :key="lang.code"
           @click="switchLanguage(lang.code)"
           :class="{ 'lang-active': dataStore.language === lang.code }"
+          role="option"
+          :aria-selected="dataStore.language === lang.code"
           rounded="lg"
         >
           <v-list-item-title class="lang-list-item-title">{{ lang.label }}</v-list-item-title>
@@ -143,15 +152,30 @@ onUnmounted(() => {
     <v-spacer />
 
     <!-- Desktop nav buttons -->
-    <template v-for="section in sections" :key="section.id">
-      <v-btn variant="text" @click="scrollToSection(section.id)" class="nav-btn hidden-sm-and-down">
+    <nav aria-label="Main navigation" class="hidden-sm-and-down desktop-nav">
+      <v-btn
+        v-for="section in sections"
+        :key="section.id"
+        variant="text"
+        @click="scrollToSection(section.id)"
+        class="nav-btn"
+        :aria-current="activeSection === section.id ? 'location' : undefined"
+      >
         {{ section.label }}
       </v-btn>
-    </template>
+    </nav>
 
     <!-- Mobile hamburger button -->
-    <v-btn icon @click="toggleMenu" class="hamburger-btn hidden-md-and-up" style="z-index: 2000">
-      <div class="hamburger" :class="{ active: isOpen }">
+    <v-btn
+      icon
+      @click="toggleMenu"
+      class="hamburger-btn hidden-md-and-up"
+      style="z-index: 2000"
+      :aria-label="isOpen ? 'Close navigation menu' : 'Open navigation menu'"
+      :aria-expanded="String(isOpen)"
+      aria-controls="mobile-nav-menu"
+    >
+      <div class="hamburger" :class="{ active: isOpen }" aria-hidden="true">
         <span></span>
         <span></span>
         <span></span>
@@ -160,17 +184,36 @@ onUnmounted(() => {
   </v-app-bar>
 
   <!-- Mobile fullscreen menu -->
-  <div v-if="drawer" class="mobile-menu" :class="{ 'active': isOpen }" @click="closeMenu">
+  <div
+    v-if="drawer"
+    id="mobile-nav-menu"
+    class="mobile-menu"
+    :class="{ 'active': isOpen }"
+    @click="closeMenu"
+    role="navigation"
+    aria-label="Main navigation"
+  >
     <div class="mobile-menu-content" @click.stop>
-      <div class="mobile-menu-list">
-        <div v-for="(section, index) in sections" :key="section.id" @click="scrollToSection(section.id)"
-          class="mobile-menu-item" :class="{
+      <div class="mobile-menu-list" role="list">
+        <div
+          v-for="(section, index) in sections"
+          :key="section.id"
+          @click="scrollToSection(section.id)"
+          @keydown.enter="scrollToSection(section.id)"
+          @keydown.space.prevent="scrollToSection(section.id)"
+          tabindex="0"
+          role="menuitem"
+          :aria-current="activeSection === section.id ? 'location' : undefined"
+          class="mobile-menu-item"
+          :class="{
             'active': isOpen,
             'is-current': activeSection === section.id
-          }" :style="[
+          }"
+          :style="[
             { transitionDelay: `${index * 0.08}s` },
             { backgroundColor: activeSection === section.id ? menuItemActiveColor : menuItemColor }
-          ]">
+          ]"
+        >
           {{ section.label }}
         </div>
 
@@ -334,7 +377,12 @@ onUnmounted(() => {
   transform: scale(1.02);
   filter: brightness(1.1);
 }
-
+/* ── Desktop nav wrapper ── */
+.desktop-nav {
+  display: flex;
+  height: 100%;
+  align-items: stretch;
+}
 /* ── Language switcher ── */
 .lang-nav-btn {
   color: #111;

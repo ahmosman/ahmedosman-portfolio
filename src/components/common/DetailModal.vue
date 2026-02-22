@@ -1,21 +1,28 @@
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="isOpen" class="modal-overlay" @click="close">
-        <div class="modal-content" :style="{ backgroundColor: backgroundColor }" @click.stop>
+      <div v-if="isOpen" class="modal-overlay" @click="close" role="presentation">
+        <div
+          class="modal-content"
+          :style="{ backgroundColor: backgroundColor }"
+          @click.stop
+          role="dialog"
+          aria-modal="true"
+          aria-label="Details"
+        >
           <div class="modal-header">
             <div class="header-links">
               <a v-if="projectLink" :href="projectLink" target="_blank" rel="noopener noreferrer" class="icon-link"
-                title="View Project">
-                <svg-icon type="mdi" :path="mdiOpenInNew" />
+                aria-label="View project (opens in new tab)">
+                <svg-icon type="mdi" :path="mdiOpenInNew" aria-hidden="true" />
               </a>
               <a v-if="githubLink" :href="githubLink" target="_blank" rel="noopener noreferrer" class="icon-link"
-                title="View on GitHub">
-                <svg-icon type="mdi" :path="mdiGithub" />
+                aria-label="View on GitHub (opens in new tab)">
+                <svg-icon type="mdi" :path="mdiGithub" aria-hidden="true" />
               </a>
             </div>
-            <button class="close-btn" @click="close">
-              <svg-icon type="mdi" :path="mdiClose" />
+            <button class="close-btn" @click="close" aria-label="Close dialog">
+              <svg-icon type="mdi" :path="mdiClose" aria-hidden="true" />
             </button>
           </div>
 
@@ -25,12 +32,12 @@
 
           <div class="mobile-footer-links" v-if="projectLink || githubLink">
             <a v-if="projectLink" :href="projectLink" target="_blank" rel="noopener noreferrer" class="footer-link"
-              title="View Project">
-              <svg-icon type="mdi" :path="mdiOpenInNew" />
+              aria-label="View project (opens in new tab)">
+              <svg-icon type="mdi" :path="mdiOpenInNew" aria-hidden="true" />
             </a>
             <a v-if="githubLink" :href="githubLink" target="_blank" rel="noopener noreferrer" class="footer-link"
-              title="View on GitHub">
-              <svg-icon type="mdi" :path="mdiGithub" />
+              aria-label="View on GitHub (opens in new tab)">
+              <svg-icon type="mdi" :path="mdiGithub" aria-hidden="true" />
             </a>
           </div>
         </div>

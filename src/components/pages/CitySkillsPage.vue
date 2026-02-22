@@ -16,12 +16,17 @@
           >
             <h3 class="section-heading">{{ section.name }}</h3>
 
-            <div class="pills-container">
+            <div class="pills-container" role="list">
               <div
                 v-for="skill in section.skills"
                 :key="skill.id"
                 class="skill-pill"
+                role="button"
+                tabindex="0"
+                :aria-label="skill.name"
                 @click="openSkillDetails(skill)"
+                @keydown.enter="openSkillDetails(skill)"
+                @keydown.space.prevent="openSkillDetails(skill)"
               >
                 <img :src="getIconUrl(skill.icon)" :alt="skill.name" class="skill-icon" />
                 <span class="skill-name">{{ skill.name }}</span>
@@ -34,7 +39,7 @@
       <DetailModal :is-open="isModalOpen" :background-color="blockColor" @close="closeModal">
         <div v-if="selectedSkill" class="modal-skill-content">
           <div class="modal-header">
-            <img :src="getIconUrl(selectedSkill.icon)" class="modal-icon-large" />
+            <img :src="getIconUrl(selectedSkill.icon)" :alt="selectedSkill.name" class="modal-icon-large" />
             <h3 class="modal-title">{{ selectedSkill.name }}</h3>
           </div>
           <p class="modal-description">{{ selectedSkill.description }}</p>

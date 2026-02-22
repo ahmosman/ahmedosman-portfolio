@@ -21,11 +21,13 @@
         show-arrows="hover"
         hide-delimiter-background
         theme="dark"
+        aria-label="Project screenshots"
       >
         <v-carousel-item
           v-for="(detail, i) in details"
           :key="i"
           :src="getImageUrl(detail.image)"
+          :alt="detail.description"
         >
           </v-carousel-item>
       </v-carousel>
@@ -38,7 +40,7 @@
         </p>
       </transition>
 
-      <div class="slide-counter">
+      <div class="slide-counter" aria-live="polite" aria-atomic="true">
         {{ currentSlide + 1 }} / {{ details.length }}
       </div>
     </div>

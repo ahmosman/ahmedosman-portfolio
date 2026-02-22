@@ -1,14 +1,15 @@
 <template>
-  <div class="carousel-container">
+  <div class="carousel-container" role="region" aria-label="Projects carousel" aria-roledescription="carousel">
     <button
       class="nav-arrow left"
       :style="{
         backgroundColor: blockColor,
         borderColor: blockColor
       }"
+      aria-label="Previous project"
       @click="scroll('left')"
     >
-      &#10094;
+      <span aria-hidden="true">&#10094;</span>
     </button>
 
     <div
@@ -27,6 +28,9 @@
         :key="project.id"
         class="carousel-item"
         ref="itemsRefs"
+        role="group"
+        aria-roledescription="slide"
+        :aria-label="`${index + 1} of ${projects.length}: ${project.name}`"
         @click="handleItemClick(index)"
       >
         <div :class="{ 'pointer-events-none': isDragging }">
@@ -50,9 +54,10 @@
         backgroundColor: blockColor,
         borderColor: blockColor
       }"
+      aria-label="Next project"
       @click="scroll('right')"
     >
-      &#10095;
+      <span aria-hidden="true">&#10095;</span>
     </button>
   </div>
 </template>

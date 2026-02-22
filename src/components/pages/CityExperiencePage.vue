@@ -15,9 +15,20 @@
             <div v-for="institution in section.institutions" :key="institution.id" class="institution-group">
               <h4 class="institution-name">{{ institution.name }}</h4>
 
-              <div class="items-list">
-                <div v-for="item in institution.items" :key="item.id" class="item-row"
-                  :class="{ active: selectedItemId === item.id }" @click="selectItem(item.id, institution.name)">
+              <div class="items-list" role="list">
+                <div
+                  v-for="item in institution.items"
+                  :key="item.id"
+                  class="item-row"
+                  :class="{ active: selectedItemId === item.id }"
+                  role="button"
+                  tabindex="0"
+                  :aria-selected="selectedItemId === item.id"
+                  :aria-label="item.title + ', ' + item.period"
+                  @click="selectItem(item.id, institution.name)"
+                  @keydown.enter="selectItem(item.id, institution.name)"
+                  @keydown.space.prevent="selectItem(item.id, institution.name)"
+                >
                   <span class="item-period">{{ item.period }}</span>
                   <span class="item-title">{{ item.title }}</span>
                 </div>
@@ -27,10 +38,17 @@
         </div>
 
         <div class="right-column" v-if="!isMobile">
-          <div class="content-block detail-block-content" ref="floatingBlockRef" :style="{
-            transform: `translate3d(0, ${floatingY}px, 0)`,
-            backgroundColor: blockColor,
-          }">
+          <div
+            class="content-block detail-block-content"
+            ref="floatingBlockRef"
+            :style="{
+              transform: `translate3d(0, ${floatingY}px, 0)`,
+              backgroundColor: blockColor,
+            }"
+            role="region"
+            aria-label="Experience details"
+            aria-live="polite"
+          >
             <div v-if="selectedItem">
               <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
               <h4 class="detail-job-title">{{ selectedItem.title }}</h4>

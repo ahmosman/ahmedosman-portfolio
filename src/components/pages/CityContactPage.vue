@@ -9,19 +9,32 @@
       <div class="contact-display-area">
         <div class="cards-container">
 
-          <div v-for="section in sections" :key="section.id" class="contact-card"
-            :style="{ backgroundColor: cardColor}">
+          <div
+            v-for="section in sections"
+            :key="section.id"
+            class="contact-card"
+            :style="{ backgroundColor: cardColor}"
+            role="article"
+            :aria-label="section.id === 'email' ? 'Email contact' : section.id === 'cv' ? 'Download CV' : section.id === 'linkedin' ? 'LinkedIn profile' : 'GitHub profile'"
+          >
             <template v-if="section.id === 'email'">
-              <v-icon class="card-icon" size="48">mdi-email-outline</v-icon>
+              <v-icon class="card-icon" size="48" aria-hidden="true">mdi-email-outline</v-icon>
               <span class="card-text">{{ section.email }}</span>
-              <button class="action-btn" :class="{ 'shake': isShaking }" :style="{ backgroundColor: buttonColor }"
-                @click="copyEmail(section)">
+              <button
+                class="action-btn"
+                :class="{ 'shake': isShaking }"
+                :style="{ backgroundColor: buttonColor }"
+                :aria-label="copySuccess ? section['copied-label'] : section['copy-label']"
+                :aria-live="'polite'"
+                :aria-atomic="'true'"
+                @click="copyEmail(section)"
+              >
                 {{ copySuccess ? section['copied-label'] : section['copy-label'] }}
               </button>
             </template>
 
             <template v-else-if="section.id === 'cv'">
-              <v-icon class="card-icon" size="48">mdi-file-document-outline</v-icon>
+              <v-icon class="card-icon" size="48" aria-hidden="true">mdi-file-document-outline</v-icon>
               <span class="card-text">{{ section.name }}</span>
               <div class="btn-group">
                 <a :href="getFileUrl(section['english-link'])" target="_blank" rel="noopener noreferrer" class="action-btn half-btn"
@@ -36,7 +49,7 @@
             </template>
 
             <template v-else-if="section.id === 'linkedin'">
-              <v-icon class="card-icon" size="48">mdi-linkedin</v-icon>
+              <v-icon class="card-icon" size="48" aria-hidden="true">mdi-linkedin</v-icon>
               <span class="card-text">{{ section.name }}</span>
               <a :href="section.link" target="_blank" rel="noopener noreferrer" class="action-btn"
                 :style="{ backgroundColor: buttonColor }">
@@ -45,7 +58,7 @@
             </template>
 
             <template v-else-if="section.id === 'github'">
-              <v-icon class="card-icon" size="48">mdi-github</v-icon>
+              <v-icon class="card-icon" size="48" aria-hidden="true">mdi-github</v-icon>
               <span class="card-text">{{ section.name }}</span>
               <a :href="section.link" target="_blank" rel="noopener noreferrer" class="action-btn"
                 :style="{ backgroundColor: buttonColor }">

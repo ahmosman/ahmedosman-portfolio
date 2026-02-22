@@ -17,23 +17,23 @@ const { backgroundColor } = useScrollBackground()
 
     <div class="global-sky" :style="{ background: backgroundColor }"></div>
 
-    <main class="app-content">
-      <section id="main-page">
+    <main class="app-content" aria-label="Portfolio content">
+      <section id="main-page" aria-label="Introduction">
         <CityMainPagePage />
       </section>
-      <section id="experience">
+      <section id="experience" aria-label="Experience">
         <CityExperiencePage />
       </section>
-      <section id="skills">
+      <section id="skills" aria-label="Skills">
         <CitySkillsPage />
       </section>
-      <section id="projects">
+      <section id="projects" aria-label="Projects">
         <CityProjectsPage />
       </section>
-      <section id="about">
+      <section id="about" aria-label="About me">
         <CityAboutPage />
       </section>
-      <section id="contact">
+      <section id="contact" aria-label="Contact">
         <CityContactPage />
       </section>
     </main>

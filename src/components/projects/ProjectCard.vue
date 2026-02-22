@@ -3,6 +3,8 @@
     class="project-card"
     :class="{ 'is-active': isActive, 'is-inactive': !isActive }"
     :style="{ backgroundColor: blockColor }"
+    role="article"
+    :aria-label="project.name"
   >
     <div class="card-inner">
       <div class="card-header">
@@ -20,6 +22,7 @@
       <button
         class="show-btn"
         :class="{ 'btn-visible': isActive }"
+        :aria-label="`Show details: ${project.name}`"
         @click.stop="$emit('open', project)"
       >
         {{ showText }}
