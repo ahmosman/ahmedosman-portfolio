@@ -10,6 +10,8 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 
+import VueConfetti from 'vue-confetti'
+
 const app = createApp(App)
 
 app.use(createPinia())
@@ -20,4 +22,7 @@ const vuetify = createVuetify({
 })
 
 app.use(vuetify)
+
+app.use(VueConfetti)
+
 app.mount('#app')

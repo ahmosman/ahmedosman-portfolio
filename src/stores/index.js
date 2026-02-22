@@ -4,6 +4,7 @@ import skillsData from '@/data/skills.json'
 import mainData from '@/data/main.json'
 import projectsData from '@/data/projects.json'
 import aboutData from '@/data/about.json'
+import contactData from '@/data/contact.json'
 
 export const useDataStore = defineStore('data', {
   state: () => ({
@@ -12,6 +13,7 @@ export const useDataStore = defineStore('data', {
     main: {},
     projects: {},
     about: {},
+    contact: {},
     isDataLoaded: false,
   }),
   getters: {
@@ -24,6 +26,8 @@ export const useDataStore = defineStore('data', {
     getProjectsList: (state) => state.projects.sections || [],
     getAboutPage: (state) => state.about.page || {},
     getAboutSections: (state) => state.about.sections || [],
+    getContactPage: (state) => state.contact.page || {},
+    getContactSections: (state) => state.contact.sections || [],
   },
   actions: {
     loadAllData() {
@@ -32,6 +36,7 @@ export const useDataStore = defineStore('data', {
       this.main = mainData
       this.projects = projectsData
       this.about = aboutData
+      this.contact = contactData
       this.isDataLoaded = true
     },
   },
