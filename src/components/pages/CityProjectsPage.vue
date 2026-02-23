@@ -36,7 +36,7 @@
 
 <script setup>
 import '@/assets/pages-common.css'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useDataStore } from '@/stores'
 import { useScrollBackground } from '@/composables/useScrollColor'
 import DetailModal from '@/components/common/DetailModal.vue'

@@ -120,10 +120,15 @@ const floatingBlockRef = ref(null)
 const floatingY = ref(0)
 let targetY = 0
 let animationFrameId = null
+let isSectionVisible = false
+let sectionObserver = null
 const EASE_FACTOR = 0.02
 
 function animateFloatingBlock() {
-  if (isMobile.value) return
+  if (isMobile.value || !isSectionVisible) {
+    animationFrameId = null
+    return
+  }
   if (!containerRef.value || !floatingBlockRef.value) {
     animationFrameId = requestAnimationFrame(animateFloatingBlock)
     return
@@ -140,10 +145,21 @@ function animateFloatingBlock() {
 
   targetY = idealY
   const diff = targetY - floatingY.value
-  if (Math.abs(diff) > 0.1) floatingY.value += diff * EASE_FACTOR
-  else floatingY.value = targetY
+  if (Math.abs(diff) > 0.1) {
+    floatingY.value += diff * EASE_FACTOR
+    animationFrameId = requestAnimationFrame(animateFloatingBlock)
+  } else {
+    floatingY.value = targetY
+    // Stop loop when converged — will restart on next scroll via observer
+    animationFrameId = null
+  }
+}
 
-  animationFrameId = requestAnimationFrame(animateFloatingBlock)
+/** Start the loop only if not already running */
+function startAnimation() {
+  if (!isMobile.value && animationFrameId === null) {
+    animationFrameId = requestAnimationFrame(animateFloatingBlock)
+  }
 }
 
 // --- Helpers ---
@@ -159,9 +175,7 @@ function getItemById(id) {
 
 function checkMobile() {
   isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
-  if (!isMobile.value && !animationFrameId) {
-    animationFrameId = requestAnimationFrame(animateFloatingBlock)
-  }
+  if (!isMobile.value) startAnimation()
 }
 
 function selectItem(itemId, institutionName) {
@@ -198,11 +212,27 @@ onMounted(() => {
   }
 
   animationFrameId = requestAnimationFrame(animateFloatingBlock)
+
+  window.addEventListener('scroll', startAnimation, { passive: true })
+
+  const sectionEl = document.getElementById('experience')
+  if (sectionEl) {
+    sectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        isSectionVisible = entry.isIntersecting
+        if (isSectionVisible) startAnimation()
+      },
+      { threshold: 0 }
+    )
+    sectionObserver.observe(sectionEl)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkMobile)
+  window.removeEventListener('scroll', startAnimation)
   if (animationFrameId) cancelAnimationFrame(animationFrameId)
+  if (sectionObserver) sectionObserver.disconnect()
 })
 </script>
 

@@ -21,10 +21,8 @@ const menuItemColor = computed(() => getAdjustedColor(backgroundColor.value, 0.9
 const menuItemActiveColor = computed(() => getAdjustedColor(backgroundColor.value, 0.85, 0.75))
 const langMenuBgColor = computed(() => getAdjustedColor(backgroundColor.value, 0.78, 0.72))
 
-// Nav sections from store (reactive to language change)
 const sections = computed(() => dataStore.getNavSections)
 
-// Language switcher
 const languages = [
   { code: 'en', label: 'English' },
   { code: 'pl', label: 'Polski' },
@@ -40,39 +38,67 @@ const drawer = ref(false)
 const isOpen = ref(false)
 const activeSection = ref('main-page')
 
+let isAutoScrolling = false
+let currentScrollRafId = null
+
 /**
- * Custom Smooth Scroll
+ * Easing function — cubic ease-in-out for natural feel.
  */
-const smoothScrollToElement = (target, duration = 800) => {
-  const targetPosition = target.getBoundingClientRect().top + window.scrollY
-  const startPosition = window.scrollY
-  const distance = targetPosition - startPosition
+const easeInOutCubic = (t) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
+/**
+ * JS-driven smooth scroll using requestAnimationFrame.
+ * Cancels any in-flight animation before starting a new one,
+ * so rapid clicks never stack up multiple loops.
+ */
+const smoothScrollTo = (targetY, duration = 700) => {
+  // Cancel previous animation if still running
+  if (currentScrollRafId !== null) {
+    cancelAnimationFrame(currentScrollRafId)
+    currentScrollRafId = null
+  }
+
+  isAutoScrolling = true
+  const startY = window.scrollY
+  const distance = targetY - startY
+
+  if (Math.abs(distance) < 1) {
+    isAutoScrolling = false
+    return
+  }
+
   let startTime = null
 
-  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+  const step = (timestamp) => {
+    if (startTime === null) startTime = timestamp
+    const elapsed = timestamp - startTime
+    const progress = Math.min(elapsed / duration, 1)
 
-  const animation = (currentTime) => {
-    if (startTime === null) startTime = currentTime
-    const timeElapsed = currentTime - startTime
-    const progress = Math.min(timeElapsed / duration, 1)
+    window.scrollTo(0, startY + distance * easeInOutCubic(progress))
 
-    window.scrollTo(0, startPosition + distance * ease(progress))
-
-    if (timeElapsed < duration) {
-      requestAnimationFrame(animation)
+    if (progress < 1) {
+      currentScrollRafId = requestAnimationFrame(step)
+    } else {
+      currentScrollRafId = null
+      isAutoScrolling = false
+      updateActiveSection()
     }
   }
-  requestAnimationFrame(animation)
+
+  currentScrollRafId = requestAnimationFrame(step)
 }
 
 /**
- * Close menu and scroll to section
+ * Close menu and scroll to section.
  */
 const scrollToSection = (sectionId) => {
   closeMenu()
   const element = document.getElementById(sectionId)
   if (element) {
-    smoothScrollToElement(element, 800)
+    activeSection.value = sectionId
+    const targetY = element.getBoundingClientRect().top + window.scrollY
+    smoothScrollTo(targetY, 700)
   }
 }
 
@@ -94,27 +120,42 @@ const toggleMenu = () => {
 }
 
 /**
- * Detect active section on scroll
+ * Detect active section on scroll — throttled via rAF
+ * to avoid forced layout reflows (offsetTop reads) on every raw event.
  */
 const updateActiveSection = () => {
+  if (isAutoScrolling) return
+
   const scrollPosition = window.scrollY + window.innerHeight / 3
 
   for (let i = sections.value.length - 1; i >= 0; i--) {
     const el = document.getElementById(sections.value[i].id)
     if (el && scrollPosition >= el.offsetTop) {
-      activeSection.value = sections.value[i].id
+      if (activeSection.value !== sections.value[i].id) {
+        activeSection.value = sections.value[i].id
+      }
       return
     }
   }
 }
 
+let sectionRafPending = false
+const throttledUpdateActiveSection = () => {
+  if (sectionRafPending) return
+  sectionRafPending = true
+  requestAnimationFrame(() => {
+    updateActiveSection()
+    sectionRafPending = false
+  })
+}
+
 onMounted(() => {
   updateActiveSection()
-  window.addEventListener('scroll', updateActiveSection, { passive: true })
+  window.addEventListener('scroll', throttledUpdateActiveSection, { passive: true })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', updateActiveSection)
+  window.removeEventListener('scroll', throttledUpdateActiveSection)
 })
 </script>
 
@@ -123,27 +164,17 @@ onUnmounted(() => {
     <!-- Language button – always on the left, desktop & mobile -->
     <v-menu v-model="langMenuOpen" location="bottom start" :close-on-content-click="false">
       <template #activator="{ props: menuProps }">
-        <v-btn
-          variant="text"
-          v-bind="menuProps"
-          class="lang-nav-btn"
+        <v-btn variant="text" v-bind="menuProps" class="lang-nav-btn"
           :aria-label="'Select language, current: ' + (dataStore.language === 'en' ? 'English' : 'Polski')"
-          :aria-expanded="String(langMenuOpen)"
-          aria-haspopup="listbox"
-        >
+          :aria-expanded="String(langMenuOpen)" aria-haspopup="listbox">
           <v-icon aria-hidden="true">mdi-translate</v-icon>
         </v-btn>
       </template>
-      <v-list class="lang-list" density="compact" :style="{ backgroundColor: langMenuBgColor }" role="listbox" aria-label="Language selection">
-        <v-list-item
-          v-for="lang in languages"
-          :key="lang.code"
-          @click="switchLanguage(lang.code)"
-          :class="{ 'lang-active': dataStore.language === lang.code }"
-          role="option"
-          :aria-selected="dataStore.language === lang.code"
-          rounded="lg"
-        >
+      <v-list class="lang-list" density="compact" :style="{ backgroundColor: langMenuBgColor }" role="listbox"
+        aria-label="Language selection">
+        <v-list-item v-for="lang in languages" :key="lang.code" @click="switchLanguage(lang.code)"
+          :class="{ 'lang-active': dataStore.language === lang.code }" role="option"
+          :aria-selected="dataStore.language === lang.code" rounded="lg">
           <v-list-item-title class="lang-list-item-title">{{ lang.label }}</v-list-item-title>
         </v-list-item>
       </v-list>
@@ -153,28 +184,16 @@ onUnmounted(() => {
 
     <!-- Desktop nav buttons -->
     <nav aria-label="Main navigation" class="hidden-sm-and-down desktop-nav">
-      <v-btn
-        v-for="section in sections"
-        :key="section.id"
-        variant="text"
-        @click="scrollToSection(section.id)"
-        class="nav-btn"
-        :aria-current="activeSection === section.id ? 'location' : undefined"
-      >
+      <v-btn v-for="section in sections" :key="section.id" variant="text" @click="scrollToSection(section.id)"
+        class="nav-btn" :aria-current="activeSection === section.id ? 'location' : undefined">
         {{ section.label }}
       </v-btn>
     </nav>
 
     <!-- Mobile hamburger button -->
-    <v-btn
-      icon
-      @click="toggleMenu"
-      class="hamburger-btn hidden-md-and-up"
-      style="z-index: 2000"
-      :aria-label="isOpen ? 'Close navigation menu' : 'Open navigation menu'"
-      :aria-expanded="String(isOpen)"
-      aria-controls="mobile-nav-menu"
-    >
+    <v-btn icon @click="toggleMenu" class="hamburger-btn hidden-md-and-up" style="z-index: 2000"
+      :aria-label="isOpen ? 'Close navigation menu' : 'Open navigation menu'" :aria-expanded="String(isOpen)"
+      aria-controls="mobile-nav-menu">
       <div class="hamburger" :class="{ active: isOpen }" aria-hidden="true">
         <span></span>
         <span></span>
@@ -184,36 +203,20 @@ onUnmounted(() => {
   </v-app-bar>
 
   <!-- Mobile fullscreen menu -->
-  <div
-    v-if="drawer"
-    id="mobile-nav-menu"
-    class="mobile-menu"
-    :class="{ 'active': isOpen }"
-    @click="closeMenu"
-    role="navigation"
-    aria-label="Main navigation"
-  >
+  <div v-if="drawer" id="mobile-nav-menu" class="mobile-menu" :class="{ 'active': isOpen }" @click="closeMenu"
+    role="navigation" aria-label="Main navigation">
     <div class="mobile-menu-content" @click.stop>
       <div class="mobile-menu-list" role="list">
-        <div
-          v-for="(section, index) in sections"
-          :key="section.id"
-          @click="scrollToSection(section.id)"
-          @keydown.enter="scrollToSection(section.id)"
-          @keydown.space.prevent="scrollToSection(section.id)"
-          tabindex="0"
-          role="menuitem"
-          :aria-current="activeSection === section.id ? 'location' : undefined"
-          class="mobile-menu-item"
+        <div v-for="(section, index) in sections" :key="section.id" @click="scrollToSection(section.id)"
+          @keydown.enter="scrollToSection(section.id)" @keydown.space.prevent="scrollToSection(section.id)" tabindex="0"
+          role="menuitem" :aria-current="activeSection === section.id ? 'location' : undefined" class="mobile-menu-item"
           :class="{
             'active': isOpen,
             'is-current': activeSection === section.id
-          }"
-          :style="[
+          }" :style="[
             { transitionDelay: `${index * 0.08}s` },
             { backgroundColor: activeSection === section.id ? menuItemActiveColor : menuItemColor }
-          ]"
-        >
+          ]">
           {{ section.label }}
         </div>
 
@@ -377,12 +380,14 @@ onUnmounted(() => {
   transform: scale(1.02);
   filter: brightness(1.1);
 }
+
 /* ── Desktop nav wrapper ── */
 .desktop-nav {
   display: flex;
   height: 100%;
   align-items: stretch;
 }
+
 /* ── Language switcher ── */
 .lang-nav-btn {
   color: #111;

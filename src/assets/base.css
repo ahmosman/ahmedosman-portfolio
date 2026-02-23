@@ -66,9 +66,6 @@ body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
   line-height: 1.6;
   font-family:
     Inter,
@@ -98,3 +95,8 @@ body {
 body {
   background: transparent;
 }
+
+/* scroll-behavior is NOT set here on purpose.
+   Smooth scrolling is handled programmatically in AppBar.vue.
+   A CSS scroll-behavior:smooth would conflict with JS-driven scrollTo()
+   calls, causing double-animation or cancelled animations. */

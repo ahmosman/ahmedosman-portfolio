@@ -47,7 +47,7 @@ const activeItem = computed(() => items.value[activeIndex.value] || null)
 
 const SECTOR_ANGLE = 40
 const RADIUS = 105
-const TEXT_RADIUS = 60
+const TEXT_RADIUS = 55
 
 const sunRotation = computed(() => {
   return -1 * (activeIndex.value * SECTOR_ANGLE)

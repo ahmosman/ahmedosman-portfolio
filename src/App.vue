@@ -48,7 +48,8 @@ const { backgroundColor } = useScrollBackground()
   width: 100vw;
   height: 100vh;
   z-index: -1; /* Must be below everything */
-  transition: background 0.1s linear; /* Smooth transition */
+  will-change: background-color;
+  transition: background-color 0.15s linear;
 }
 
 .app-content {
