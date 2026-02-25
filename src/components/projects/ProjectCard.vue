@@ -95,11 +95,6 @@ defineEmits(['open'])
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .image-wrapper {

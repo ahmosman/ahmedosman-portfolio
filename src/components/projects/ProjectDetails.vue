@@ -10,7 +10,7 @@
       </div>
       <div class="info-chip description-chip">
         <span class="chip-label">{{ descriptionLabel }}:</span>
-        {{ project.description }}
+        <span v-html="project.description"></span>
       </div>
     </div>
 
@@ -35,9 +35,7 @@
 
     <div class="slide-info">
       <transition name="fade" mode="out-in">
-        <p :key="currentSlide" class="slide-description">
-          {{ currentDetail?.description }}
-        </p>
+        <p :key="currentSlide" class="slide-description" v-html="currentDetail?.description"></p>
       </transition>
 
       <div class="slide-counter" aria-live="polite" aria-atomic="true">
