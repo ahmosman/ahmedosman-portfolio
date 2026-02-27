@@ -11,6 +11,9 @@
           :projects="projects"
           :blockColor="blockColor"
           :showText="pageData['show-label']"
+          :githubLabel="pageData['more-projects-label']"
+          :githubLinkLabel="pageData['github-link-label']"
+          :githubUrl="pageData['github-link']"
           @open-details="openModal"
         />
       </div>
@@ -52,7 +55,11 @@ const blockColor = computed(() => {
   const hex = backgroundColor.value
   if (!hex) return 'rgba(219, 206, 211, 0.95)'
   let cleanHex = hex.substring(1)
-  if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c + c).join('')
+  if (cleanHex.length === 3)
+    cleanHex = cleanHex
+      .split('')
+      .map((c) => c + c)
+      .join('')
   const num = parseInt(cleanHex, 16)
   let r = (num >> 16) & 255
   let g = (num >> 8) & 255
@@ -71,10 +78,10 @@ function openModal(project) {
 
 function closeModal() {
   isModalOpen.value = false
-  setTimeout(() => { selectedProject.value = null }, 300)
+  setTimeout(() => {
+    selectedProject.value = null
+  }, 300)
 }
-
-
 </script>
 
 <style scoped>
