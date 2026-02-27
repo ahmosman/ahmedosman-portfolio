@@ -8,11 +8,19 @@
 
       <div class="experience-flex-container" ref="containerRef">
         <div class="left-column">
-          <div v-for="section in sections" :key="section.id" class="content-block"
-            :style="{ backgroundColor: blockColor }">
+          <div
+            v-for="section in sections"
+            :key="section.id"
+            class="content-block"
+            :style="{ backgroundColor: blockColor }"
+          >
             <h3 class="block-heading">{{ section.name }}</h3>
 
-            <div v-for="institution in section.institutions" :key="institution.id" class="institution-group">
+            <div
+              v-for="institution in section.institutions"
+              :key="institution.id"
+              class="institution-group"
+            >
               <h4 class="institution-name">{{ institution.name }}</h4>
 
               <div class="items-list" role="list">
@@ -53,7 +61,11 @@
               <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
               <h4 class="detail-job-title">{{ selectedItem.title }}</h4>
 
-              <div class="detail-body" ref="detailScrollRef" v-html="selectedItem.description"></div>
+              <div
+                class="detail-body"
+                ref="detailScrollRef"
+                v-html="selectedItem.description"
+              ></div>
             </div>
             <div v-else class="placeholder-state">
               <p>Select an item from the left to view details</p>
@@ -62,7 +74,11 @@
         </div>
       </div>
 
-      <DetailModal :is-open="isMobile && showModal" :background-color="blockColor" @close="closeModal">
+      <DetailModal
+        :is-open="isMobile && showModal"
+        :background-color="blockColor"
+        @close="closeModal"
+      >
         <div v-if="selectedItem">
           <h3 class="detail-institution">{{ selectedInstitutionName }}</h3>
           <h4 class="detail-job-title">{{ selectedItem.title }}</h4>
@@ -88,9 +104,23 @@ const sections = computed(() => dataStore.getExperienceSections)
 
 // Local state
 const selectedItemId = ref(null)
-const selectedItem = ref(null)
-const selectedInstitutionName = ref('')
-// DODANO ref do kontenera z tekstem
+
+// Computed so they reactively update on language change
+const selectedItem = computed(() => {
+  if (!selectedItemId.value) return null
+  return getItemById(selectedItemId.value)
+})
+
+const selectedInstitutionName = computed(() => {
+  if (!selectedItemId.value) return ''
+  for (const section of sections.value) {
+    for (const inst of section.institutions) {
+      if (inst.items.find((i) => i.id === selectedItemId.value)) return inst.name
+    }
+  }
+  return ''
+})
+
 const detailScrollRef = ref(null)
 
 const isMobile = ref(false)
@@ -105,7 +135,10 @@ const blockColor = computed(() => {
   if (!hex) return 'rgba(164, 200, 221, 0.85)'
   let cleanHex = hex.substring(1)
   if (cleanHex.length === 3)
-    cleanHex = cleanHex.split('').map((c) => c + c).join('')
+    cleanHex = cleanHex
+      .split('')
+      .map((c) => c + c)
+      .join('')
   const num = parseInt(cleanHex, 16)
   let r = (num >> 16) & 255,
     g = (num >> 8) & 255,
@@ -178,10 +211,8 @@ function checkMobile() {
   if (!isMobile.value) startAnimation()
 }
 
-function selectItem(itemId, institutionName) {
+function selectItem(itemId) {
   selectedItemId.value = itemId
-  selectedItem.value = getItemById(itemId)
-  selectedInstitutionName.value = institutionName
 
   if (isMobile.value) {
     showModal.value = true
@@ -222,7 +253,7 @@ onMounted(() => {
         isSectionVisible = entry.isIntersecting
         if (isSectionVisible) startAnimation()
       },
-      { threshold: 0 }
+      { threshold: 0 },
     )
     sectionObserver.observe(sectionEl)
   }
