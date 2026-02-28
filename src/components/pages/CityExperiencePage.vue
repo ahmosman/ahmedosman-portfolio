@@ -526,4 +526,16 @@ onUnmounted(() => {
     min-height: 300px;
   }
 }
+
+@media (max-width: 600px) {
+  .detail-institution {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-job-title {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+}
 </style>
