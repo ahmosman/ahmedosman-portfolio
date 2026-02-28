@@ -1,47 +1,69 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { useScrollBackground } from './composables/useScrollColor'
+import CityMainPagePage from './components/pages/CityMainPagePage.vue'
+import CityExperiencePage from './components/pages/CityExperiencePage.vue'
+import CitySkillsPage from './components/pages/CitySkillsPage.vue'
+import CityProjectsPage from './components/pages/CityProjectsPage.vue'
+import CityAboutPage from './components/pages/CityAboutPage.vue'
+import CityContactPage from './components/pages/CityContactPage.vue'
+import AppBar from './components/AppBar.vue'
+
+const { backgroundColor } = useScrollBackground()
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <v-app>
+    <AppBar />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
+    <div class="global-sky" :style="{ background: backgroundColor }"></div>
 
-  <main>
-    <TheWelcome />
-  </main>
+    <main class="app-content" aria-label="Portfolio content">
+      <section id="main-page" aria-label="Introduction">
+        <CityMainPagePage />
+      </section>
+      <section id="experience" aria-label="Experience">
+        <CityExperiencePage />
+      </section>
+      <section id="skills" aria-label="Skills">
+        <CitySkillsPage />
+      </section>
+      <section id="projects" aria-label="Projects">
+        <CityProjectsPage />
+      </section>
+      <section id="about" aria-label="About me">
+        <CityAboutPage />
+      </section>
+      <section id="contact" aria-label="Contact">
+        <CityContactPage />
+      </section>
+    </main>
+  </v-app>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.global-sky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* Must be below everything */
+  will-change: background-color;
+  transition: background-color 0.15s linear;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.app-content {
+  position: relative;
+  z-index: 1;
+  background: transparent;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+main {
+  width: 100vw;
+  overflow-x: hidden;
+}
+section {
+  min-height: 100vh;
+  position: relative;
 }
 </style>

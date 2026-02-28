@@ -34,6 +34,10 @@
   --color-text: var(--vt-c-text-light-1);
 
   --section-gap: 160px;
+
+  --about-bg-color: #dacdaa;
+  --about-sun-color: #f0e2b9;
+  --about-mountain-color: #c8bbb4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -62,9 +66,6 @@ body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
   line-height: 1.6;
   font-family:
     Inter,
@@ -84,3 +85,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Force the main Vuetify container to be transparent */
+.v-application {
+  background: transparent !important;
+}
+
+/* Optionally: make sure that body also has no color, if it's set somewhere */
+body {
+  background: transparent;
+}
+
+/* scroll-behavior is NOT set here on purpose.
+   Smooth scrolling is handled programmatically in AppBar.vue.
+   A CSS scroll-behavior:smooth would conflict with JS-driven scrollTo()
+   calls, causing double-animation or cancelled animations. */
