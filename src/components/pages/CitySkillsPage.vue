@@ -120,7 +120,7 @@ function getIconUrl(name) {
 .skills-display-area {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   overflow: hidden;
 }
