@@ -1,20 +1,22 @@
 <template>
   <div class="city-bg">
     <div class="scene">
-      <div class="sun-container" :style="{ transform: `rotate(${sunRotation}deg)` }">
-        <svg viewBox="-105 -105 210 210" class="sun-svg">
-          <g v-for="(item, index) in items" :key="item.id" class="wedge-group"
-            :class="{ active: activeIndex === index }" @click.stop="selectItem(index)" @mouseenter="hoverIndex = index"
-            @mouseleave="hoverIndex = null">
+      <div class="sun-wrapper">
+        <div class="sun-container" :style="{ transform: `rotate(${sunRotation}deg)` }">
+          <svg viewBox="-105 -105 210 210" class="sun-svg">
+            <g v-for="(item, index) in items" :key="item.id" class="wedge-group"
+              :class="{ active: activeIndex === index }" @click.stop="selectItem(index)"
+              @mouseenter="hoverIndex = index" @mouseleave="hoverIndex = null">
 
-            <path :d="getWedgePath(index)" class="wedge-shape" />
+              <path :d="getWedgePath(index)" class="wedge-shape" />
 
-            <text class="wedge-text" :transform="getTextTransform(index)" text-anchor="middle"
-              dominant-baseline="middle">
-              {{ item.title }}
-            </text>
-          </g>
-        </svg>
+              <text class="wedge-text" :transform="getTextTransform(index)" text-anchor="middle"
+                dominant-baseline="middle">
+                {{ item.title }}
+              </text>
+            </g>
+          </svg>
+        </div>
       </div>
 
       <div class="mountain"></div>
@@ -53,7 +55,6 @@ const sunRotation = computed(() => {
   return -1 * (activeIndex.value * SECTOR_ANGLE)
 })
 
-
 const d2r = (deg) => (deg * Math.PI) / 180
 
 const getPoint = (angle, r) => {
@@ -80,8 +81,6 @@ const getTextTransform = (index) => {
 const selectItem = (index) => {
   activeIndex.value = index
 }
-
-
 </script>
 
 <style scoped>
@@ -93,22 +92,35 @@ const selectItem = (index) => {
   overflow: hidden;
 }
 
-.sun-container {
+.sun-wrapper {
   position: absolute;
-  bottom: 80vh;
-  left: -20vw;
+  top: 30%;
+  left: 0;
+
   width: 50vw;
   height: 50vw;
-  min-width: 300px;
-  min-height: 300px;
+  min-width: 380px;
+  min-height: 380px;
   max-width: 800px;
   max-height: 800px;
 
+  transform: translate(-35%, -50%);
+  z-index: 1;
+}
+
+.sun-container {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   background-color: #EFDDB3;
-  z-index: 1;
   transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1);
   box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+}
+
+.sun-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .wedge-shape {
@@ -178,7 +190,7 @@ const selectItem = (index) => {
   position: absolute;
   top: 10%;
   left: 40%;
-  width:50%;
+  width: 50%;
   pointer-events: auto;
 }
 
@@ -203,12 +215,14 @@ const selectItem = (index) => {
 
 /* Media Queries */
 @media (min-width: 1700px) {
-  .sun-container {
-    bottom: 110vh;
-  }
-
   .desc-text {
     font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 1300px) {
+  .description-area {
+    top: 5%;
   }
 }
 
@@ -217,8 +231,8 @@ const selectItem = (index) => {
     bottom: 0;
   }
 
-  .sun-container {
-    bottom: 55vh;
+  .sun-wrapper {
+    top: 35%;
   }
 }
 
@@ -227,12 +241,9 @@ const selectItem = (index) => {
     bottom: 0;
   }
 
-  .sun-container {
-    bottom: 40vh;
-  }
-
   .description-area {
-    top: 0;
+    top: auto;
+    bottom: 25%;
     left: 0;
     margin: 1.5em;
     width: calc(100% - 3em);
@@ -243,22 +254,9 @@ const selectItem = (index) => {
   }
 }
 
-
-@media (max-width: 1300px) {
-  .description-area {
-    top: 5%;
-  }
-}
-
 @media (max-width: 400px) {
   .desc-text {
-    font-size: 1em;
-  }
-}
-
-@media (max-height: 800px) {
-  .desc-text {
-    font-size: 2vh;
+    font-size: 0.85em;
   }
 }
 </style>
