@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useDataStore } from '@/stores'
 
 const dataStore = useDataStore()
@@ -135,7 +135,7 @@ const selectItem = (index) => {
 
 .wedge-group.active .wedge-text {
   fill: #5e5e5e;
-  font-size: 1em;
+  font-size: 0.85em;
 }
 
 .wedge-group:hover .wedge-text {
