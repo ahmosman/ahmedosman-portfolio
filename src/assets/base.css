@@ -84,6 +84,16 @@ body {
   background: transparent;
 }
 
+/* Links inherit the text color but render slightly darker */
+a {
+  color: color-mix(in srgb, currentColor, black 25%);
+  text-decoration-color: color-mix(in srgb, currentColor, black 10%);
+}
+
+a:hover {
+  color: color-mix(in srgb, currentColor, black 50%);
+}
+
 /* scroll-behavior is NOT set here on purpose.
    Smooth scrolling is handled programmatically in AppBar.vue.
    A CSS scroll-behavior:smooth would conflict with JS-driven scrollTo()

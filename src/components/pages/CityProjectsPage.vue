@@ -21,16 +21,16 @@
       <DetailModal
         :is-open="isModalOpen"
         :background-color="blockColor"
-        :projectLink="selectedProject?.['project-link']"
-        :githubLink="selectedProject?.['github-link']"
+        :project-link="selectedProject?.['project-link']"
+        :github-link="selectedProject?.['github-link']"
         @close="closeModal"
       >
         <ProjectDetails
           v-if="selectedProject"
           :project="selectedProject"
-          :stackLabel="pageData['stack-label']"
-          :releaseDateLabel="pageData['relase-date-label']"
-          :descriptionLabel="pageData['description-label']"
+          :stack-label="pageData['stack-label']"
+          :release-date-label="pageData['relase-date-label']"
+          :description-label="pageData['description-label']"
         />
       </DetailModal>
     </div>
@@ -115,7 +115,7 @@ function closeModal() {
 .carousel-display-area {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   overflow: hidden;
 }
