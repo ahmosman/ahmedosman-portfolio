@@ -106,12 +106,12 @@ import '@/assets/pages-common.css'
 import { ref, computed, getCurrentInstance } from 'vue'
 import { useDataStore } from '@/stores'
 import { useScrollBackground } from '@/composables/useScrollColor'
-import cvEnUrl from '@/data/files/cv-ahmed-osman-en.pdf?url'
-import cvPlUrl from '@/data/files/cv-ahmed-osman-pl.pdf?url'
+// import cvEnUrl from '@/data/files/cv-ahmed-osman-en.pdf?url'
+// import cvPlUrl from '@/data/files/cv-ahmed-osman-pl.pdf?url'
 
 const FILE_URL_MAP = {
-  'files/cv-ahmed-osman-en.pdf': cvEnUrl,
-  'files/cv-ahmed-osman-pl.pdf': cvPlUrl,
+  // 'files/cv-ahmed-osman-en.pdf': cvEnUrl,
+  // 'files/cv-ahmed-osman-pl.pdf': cvPlUrl,
 }
 
 // --- Pinia Data ---
